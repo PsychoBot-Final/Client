@@ -1,0 +1,188 @@
+import user
+import client.client as client
+import tkinter as tk
+import customtkinter as ctk
+from tkinter import *
+from tkinter import messagebox, ttk
+from tkinter.font import Font
+from user import get_instances
+from settings import WEB_SERVER_URL
+from emulators.bluestacks import (
+    get_bluestacks_windows, 
+    get_adb_port_for_instance
+)
+from scripts.script_handler import (
+    get_script_names
+)
+#     run_script,
+#     stop_script,
+#     get_running_script
+# )
+
+
+ctk.set_appearance_mode('dark')
+
+class BotInstance:
+    def __init__(self, id: int, parent_frame: ctk.CTkFrame) -> None:
+        self.id = id
+        self.frame = ctk.CTkFrame(parent_frame)
+
+        self.window_select = ctk.CTkOptionMenu(self.frame, values=list(get_bluestacks_windows().keys()))
+        self.window_select.pack(side='left', padx=(10, 0), pady=10)
+
+        self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
+        self.profile_select.pack(side='left', padx=(10, 0), pady=10)
+        
+        self.script_select = ctk.CTkOptionMenu(self.frame, values=get_script_names())
+        self.script_select.pack(side='left', padx=(10, 0), pady=10)
+
+        self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
+        self.start_button.pack(side='left', padx=(10, 0), pady=10)
+
+        self.pause_button = ctk.CTkButton(self.frame, width=70, text='Pause', command=self.pause_script)
+        self.pause_button.pack(side='left', padx=(10, 0), pady=10)
+
+        self.stop_button = ctk.CTkButton(self.frame, width=70, text='Stop', command=self.stop_script)
+        self.stop_button.pack(side='left', padx=(10, 0), pady=10)
+
+        view_screen = ctk.CTkButton(self.frame, width=60, height=60, text='VIEW', command=self.view_more)
+        view_screen.pack(side='right', padx=(0, 10), pady=10)
+
+        self.frame.pack(padx=10, pady=10, expand=True, fill='both')
+        self.frame.configure(border_color='black', border_width=1)
+
+        self.pause_button.configure(state='disabled')
+        self.stop_button.configure(state='disabled')
+
+        self.frame.after(1000, self.update_instance_names)
+
+    def start_script(self) -> None:
+        instance_name = self.window_select.get()
+        adb_port = get_adb_port_for_instance(instance_name)
+        window_name = self.window_select.get()
+        try:
+            # run_script(
+            #     self.id, 
+            #     500, 
+            #     adb_port, 
+            #     self.script_select.get(), 
+            #     window_name
+            # )
+            self.start_button.configure(state='disabled')
+            self.pause_button.configure(state='normal')
+            self.stop_button.configure(state='normal')
+            self.profile_select.configure(state='disabled')
+            self.script_select.configure(state='disabled')
+            self.window_select.configure(state='disabled')
+        except Exception as e:
+            print('Error:', e)
+            messagebox.showerror('Error', 'Error running script!')
+            return
+
+        print(get_adb_port_for_instance(instance_name))
+        print(f'Start instance: {self.id}')
+        print('Window Selected:', self.window_select.get())
+
+    def pause_script(self) -> None:
+        # script = get_running_script(self.id)
+        # script.pause_script()
+        # is_paused = script.is_script_paused()
+        # self.pause_button.configure(text='Pause' if not is_paused else 'Resume')
+        ...
+
+    def stop_script(self) -> None:
+        # stop_script(self.id)
+        self.start_button.configure(state='normal')
+        self.pause_button.configure(state='disabled')
+        self.stop_button.configure(state='disabled')
+        self.profile_select.configure(state='normal')
+        self.script_select.configure(state='normal')
+        self.window_select.configure(state='normal')
+
+    def view_more(self) -> None:
+        print(f'View # {self.id}')
+
+    def update_instance_names(self) -> None:
+        current_instances = list(self.window_select._values)
+        updated_instances = list(get_bluestacks_windows().keys())
+        if current_instances != updated_instances:
+            self.window_select.configure(values=updated_instances)
+        self.frame.after(1000, self.update_instance_names)
+
+class MainGUI:
+    def __init__(self) -> None:
+        # client.init()
+        self.num_instances = get_instances()
+        self.app = ctk.CTk()
+        self.create_ui()
+
+    def monitor_version(self) -> None:
+        client.send_message('check_version', {'version': 1.0})
+        self.app.after(1000, self.monitor_version)
+
+    def create_ui(self) -> None:
+        self.app.title('PsychoBot')
+        self.set_window_position(850, 745)
+        self.create_menu_bar()
+        self.create_frames()
+        self.create_tabs()
+        self.create_bot_instances()
+        self.app.after(1000, self.monitor_version)
+        self.app.mainloop()
+
+    def set_window_position(self, width, height):
+        screen_width = self.app.winfo_screenwidth()
+        screen_height = self.app.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.app.geometry(f"{width}x{height}+{x}+{y}")
+
+    def create_menu_bar(self) -> None:
+        menu_bar = tk.Menu(self.app)
+        self.app.config(menu=menu_bar)
+        file_menu = tk.Menu(menu_bar, tearoff=False)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="New")
+        file_menu.add_command(label="Open")
+        file_menu.add_command(label="Save")
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.app.quit)
+        #
+        edit_menu = tk.Menu(menu_bar, tearoff=False)
+        menu_bar.add_cascade(label="Edit", menu=edit_menu)
+        edit_menu.add_command(label="Cut")
+        edit_menu.add_command(label="Copy")
+        edit_menu.add_command(label="Paste")
+        #
+        help_menu = tk.Menu(menu_bar, tearoff=False)
+        menu_bar.add_cascade(label='Help', menu=help_menu)
+        help_menu.add_command(label='Discord')
+
+    def create_frames(self) -> None:
+        self.top_frame = ctk.CTkFrame(self.app, corner_radius=15, height=55)
+        self.top_frame.pack(side='top', fill='x', padx=10, pady=(10, 0))
+        self.top_frame.configure(border_color='black', border_width=1)
+        #
+        self.center_frame = ctk.CTkFrame(self.app, corner_radius=15)
+        self.center_frame.pack(side='left', fill='both', expand=True, padx=10, pady=10)
+        self.center_frame.configure(border_color='black', border_width=1)
+
+    def create_tabs(self) -> None:
+        style = ttk.Style()
+        style.configure("TNotebook.Tab", foreground="black", background="lightgray", padding=[5, 5], font=('Century Gothic', 10))    
+        notebook = ttk.Notebook(self.center_frame, style="Rounded.TNotebook")
+        notebook.pack(expand=True, fill='both')
+        self.home_tab = ctk.CTkFrame(notebook)
+        notebook.add(self.home_tab, text='Home')
+        notebook.select(self.home_tab)
+        self.bot_tab = ctk.CTkFrame(notebook)
+        notebook.add(self.bot_tab, text='Bots')
+        self.bot_tab_frame = ctk.CTkFrame(self.bot_tab)
+        self.bot_tab_frame.pack(side='left', fill='both', expand=True, padx=10, pady=10)
+        self.bot_tab_frame.configure(border_color='black', border_width=1)
+        self.settings_tab = ctk.CTkFrame(notebook)
+        notebook.add(self.settings_tab, text='Settings')
+
+    def create_bot_instances(self) -> None:
+        allowed_instances = get_instances()
+        instances = {id: BotInstance(id, self.bot_tab_frame) for id in range(allowed_instances)}
