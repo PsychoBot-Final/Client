@@ -1,3 +1,4 @@
+import sys
 import user
 import client.client as client
 import tkinter as tk
@@ -6,7 +7,6 @@ from tkinter import *
 from tkinter import messagebox, ttk
 from tkinter.font import Font
 from user import get_instances
-from settings import WEB_SERVER_URL
 from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_instance
@@ -111,10 +111,16 @@ class BotInstance:
 
 class MainGUI:
     def __init__(self) -> None:
-        # client.init()
         self.num_instances = get_instances()
         self.app = ctk.CTk()
         self.create_ui()
+
+    def on_close(self) -> None:
+        # if messagebox.askokcancel("Quit", "Do you want to exit PyschoBot?"):
+        #     print("Closing application.")
+        #     self.app.quit()
+        #     self.app.destroy()
+        sys.exit(0)
 
     def monitor_version(self) -> None:
         client.send_message('check_version', {'version': 1.0})
@@ -127,7 +133,9 @@ class MainGUI:
         self.create_frames()
         self.create_tabs()
         self.create_bot_instances()
-        self.app.after(1000, self.monitor_version)
+        # self.app.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.app.resizable(False, False)
+        # self.app.after(1000, self.monitor_version)
         self.app.mainloop()
 
     def set_window_position(self, width, height):

@@ -5,7 +5,6 @@ load_dotenv()
 
 LOCAL_SERVER_URL = os.environ.get('LOCAL_SERVER_URL')
 PUBLIC_SERVER_URL = os.environ.get('PUBLIC_SERVER_URL')
-print('locurl', LOCAL_SERVER_URL)
 
 LOCAL_HOST = '127.0.0.1'
 OUTDATED = 'outdated'

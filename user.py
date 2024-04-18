@@ -1,7 +1,5 @@
-# Store and retrieve connected user credentials
-
 user_id = None
-user_authenticated = False
+user_authenticated = None
 instances = None
 expiry_date = None
 
@@ -38,5 +36,5 @@ def get_instances() -> int:
 def get_id() -> int:
     return user_id
 
-def is_authenticated() -> bool:
+def get_authenticated() -> bool:
     return user_authenticated

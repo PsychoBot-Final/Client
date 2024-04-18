@@ -2,6 +2,7 @@ import json
 from utils import get_resource_path
 from settings import RUN_LOCAL, WEB_SERVER_URL
 
+available_scripts = []
 
 def get_script_names() -> list:
     if RUN_LOCAL:

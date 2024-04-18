@@ -1,0 +1,14 @@
+{
+    "Agility Pyramid": {
+        "module": "agility_pyramid",
+        "class": "AgilityPyramid"
+    },
+    "Blast Furnace": {
+        "module": "blast_furnace",
+        "class": "BlastFurnace"
+    },
+    "Test Script": {
+        "module": "test_script",
+        "class": "TestScript"
+    }
+}

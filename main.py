@@ -1,23 +1,23 @@
-import re
 import sys
 import json
-from client.client import init
+import time
 import requests
-from main_gui import MainGUI
 from datetime import datetime
+from main_gui import MainGUI
 from PyQt5.QtWidgets import QMessageBox
-from user import (
-    set_user_id, 
-    set_user_authenticated, 
-    set_instances,
-    set_expiry_date
-)
+from client.client import connect_to_server
 from constants import BOT_VERSION, ACCESS_DENIED
 from settings import WEB_SERVER_URL
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from error_pages import RETRY, INVALID_USER, EXPIRED_USER
+from user import (
+    set_user_id, 
+    set_instances,
+    set_expiry_date,
+    get_authenticated,
+)
 
 
 class DiscordApp(QApplication):
@@ -58,13 +58,13 @@ class DiscordWindow(QMainWindow):
             self.loadAuthPage()
 
     def loadAuthPage(self):
+        print('WEB SERVER URL:', WEB_SERVER_URL)
         self.webview.load(QUrl(f'http://{WEB_SERVER_URL}/?auth_key=1234'))
         self.webview.loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self):
         current_url = self.webview.url().toString()
-        print(f'Current URL: {current_url} .')
-        user_verified_url = f'{WEB_SERVER_URL}/verified'
+        user_verified_url = f'http://{WEB_SERVER_URL}/verified'
         if current_url == user_verified_url:
             self.webview.page().toPlainText(self.processUserDetails)
         elif ACCESS_DENIED in current_url:
@@ -90,11 +90,20 @@ class DiscordWindow(QMainWindow):
             set_user_id(user_id)
             set_instances(instances)
             set_expiry_date(expiry_date_str)
-            set_user_authenticated(True)
-            time_str = f'{days} day(s), {hours} hour(s)' if days > 0 or hours > 0 else f'{minutes} minute(s)'
-            QMessageBox.information(self, "PsychoBot", f"Welcome {username}, you have {time_str} left!")
-            self.close()
-            MainGUI()
+            connect_to_server()
+            self.setVisible(False)
+            while get_authenticated() is None:
+                time.sleep(1)
+            if get_authenticated():
+                time_str = f'{days} day(s), {hours} hour(s)' if days > 0 or hours > 0 else f'{minutes} minute(s)'
+                QMessageBox.information(self, "PsychoBot", f"Welcome {username}, you have {time_str} left!")
+                self.close()
+                MainGUI()
+            else:
+                QMessageBox.warning(self, 'Dupliate ID!', 'It seems you are already connected!')
+                self.close()
+                self.destroy()
+                sys.exit(0)
         else:
             self.webview.setHtml(INVALID_USER if status == 1 else EXPIRED_USER)
     
