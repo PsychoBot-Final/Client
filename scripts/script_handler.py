@@ -2,6 +2,17 @@ import json
 from utils import get_resource_path
 from settings import RUN_LOCAL, WEB_SERVER_URL
 
+
+scripts = {}
+
+def fetch_script(name: str, module: str, _class: str, version: float) -> None:
+    global scripts
+    if name in scripts:
+        version = float(scripts[name]['version'])
+    else:
+        ...
+
+
 available_scripts = []
 
 def get_script_names() -> list:

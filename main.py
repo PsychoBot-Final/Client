@@ -79,13 +79,11 @@ class DiscordWindow(QMainWindow):
         username = str(user_data.get('username'))
         expiry_date_str = str(user_data.get('expiry_date'))
         instances = int(user_data.get('instances'))
-        #
         expiry_date = datetime.strptime(expiry_date_str, "%Y-%m-%d %H:%M:%S")
         time_remaining = expiry_date - datetime.now()
         days = time_remaining.days
         hours = time_remaining.seconds // 3600
         minutes = time_remaining.seconds // 60
-        #
         if status == 0:
             set_user_id(user_id)
             set_instances(instances)
