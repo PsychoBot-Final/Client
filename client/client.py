@@ -4,6 +4,7 @@ from settings import WEB_SERVER_URL
 from tkinter import messagebox, ttk
 from PyQt5.QtWidgets import QMainWindow
 from user import set_user_authenticated
+import scripts.script_handler
 
 
 con = socketio.Client()

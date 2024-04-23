@@ -4,5 +4,5 @@ from constants import (
 )
 
 
-RUN_LOCAL = False
+RUN_LOCAL = True
 WEB_SERVER_URL = LOCAL_SERVER_URL if RUN_LOCAL else PUBLIC_SERVER_URL

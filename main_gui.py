@@ -1,6 +1,6 @@
 import sys
 import user
-import client.client as client
+# import client.client as client
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import *
@@ -11,13 +11,7 @@ from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_instance
 )
-from scripts.script_handler import (
-    get_script_names
-)
-#     run_script,
-#     stop_script,
-#     get_running_script
-# )
+from scripts.script_handler import start
 
 
 ctk.set_appearance_mode('dark')
@@ -33,7 +27,7 @@ class BotInstance:
         self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
         self.profile_select.pack(side='left', padx=(10, 0), pady=10)
         
-        self.script_select = ctk.CTkOptionMenu(self.frame, values=get_script_names())
+        self.script_select = ctk.CTkOptionMenu(self.frame, values=[])
         self.script_select.pack(side='left', padx=(10, 0), pady=10)
 
         self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
@@ -57,6 +51,7 @@ class BotInstance:
         self.frame.after(1000, self.update_instance_names)
 
     def start_script(self) -> None:
+        start(self.id, 'Seers Woodcutter')
         instance_name = self.window_select.get()
         adb_port = get_adb_port_for_instance(instance_name)
         window_name = self.window_select.get()
@@ -123,8 +118,9 @@ class MainGUI:
         sys.exit(0)
 
     def monitor_version(self) -> None:
-        client.send_message('check_version', {'version': 1.0})
-        self.app.after(1000, self.monitor_version)
+        ...
+        # client.send_message('check_version', {'version': 1.0})
+        # self.app.after(1000, self.monitor_version)
 
     def create_ui(self) -> None:
         self.app.title('PsychoBot')
