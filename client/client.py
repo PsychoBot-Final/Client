@@ -4,13 +4,23 @@ from settings import WEB_SERVER_URL
 from tkinter import messagebox, ttk
 from PyQt5.QtWidgets import QMainWindow
 from user import set_user_authenticated
-import scripts.script_handler
+from api_loader import receive_api
+from scripts.script_handler import recieve_script_names, receive_script
 
 
 con = socketio.Client()
 
 def connect_to_server() -> None:
+    con.on('script_names', handler=recieve_script_names)
+    con.on('full_script', handler=receive_script)
+    con.on('api_files', handler=receive_api)
     con.connect(f'http://{WEB_SERVER_URL}/?user_id={get_id()}')
+
+def request_script(type: str, name: str) -> None:
+    send_message('request_script', {'type': type, 'name': name})
+
+def request_api() -> None:
+    send_message('request_api', {})
 
 @con.event
 def authenticated(flag: bool) -> None:

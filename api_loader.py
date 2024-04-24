@@ -1,0 +1,20 @@
+import sys
+import importlib.util
+from base64 import b64decode
+
+modules = {}
+
+def receive_api(data) -> None:
+    global modules
+    print(data)
+    files = data['files']
+    for file in files:
+        filename = file['filename']
+        code = b64decode(file['content']).decode('utf-8')
+        module_name = str(filename).replace('.py', '')
+        spec = importlib.util.spec_from_loader(module_name, loader=None)
+        module = importlib.util.module_from_spec(spec)
+        exec(code, module.__dict__)
+        modules[module_name] = module
+        sys.modules[module_name] = module
+        

@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 from main_gui import MainGUI
 from PyQt5.QtWidgets import QMessageBox
-from client.client import connect_to_server
+from client.client import connect_to_server, request_script, request_api
 from constants import BOT_VERSION, ACCESS_DENIED
 from settings import WEB_SERVER_URL
 from PyQt5.QtCore import QUrl
@@ -89,6 +89,8 @@ class DiscordWindow(QMainWindow):
             set_instances(instances)
             set_expiry_date(expiry_date_str)
             connect_to_server()
+            request_script('names', {})
+            request_api()
             self.setVisible(False)
             while get_authenticated() is None:
                 time.sleep(1)

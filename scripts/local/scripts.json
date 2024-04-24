@@ -7,8 +7,8 @@
         "module": "blast_furnace",
         "class": "BlastFurnace"
     },
-    "Test Script": {
-        "module": "test_script",
-        "class": "TestScript"
+    "Seers Woodcutter": {
+        "module": "seers_woodcutter",
+        "class": "SeersWoodcutter"
     }
 }

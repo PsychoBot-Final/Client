@@ -1,6 +1,7 @@
 import sys
-import user
-# import client.client as client
+import time
+import threading
+from threading import Event
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import *
@@ -11,8 +12,15 @@ from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_instance
 )
-from scripts.script_handler import start
-
+from scripts.script_handler import (
+    start, 
+    get_available_scripts, 
+    script_exists, 
+    get_script_container, 
+    get_script_version,
+    remove_script_container
+)
+from client.client import send_message
 
 ctk.set_appearance_mode('dark')
 
@@ -27,7 +35,7 @@ class BotInstance:
         self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
         self.profile_select.pack(side='left', padx=(10, 0), pady=10)
         
-        self.script_select = ctk.CTkOptionMenu(self.frame, values=[])
+        self.script_select = ctk.CTkOptionMenu(self.frame, values=get_available_scripts())
         self.script_select.pack(side='left', padx=(10, 0), pady=10)
 
         self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
@@ -51,32 +59,40 @@ class BotInstance:
         self.frame.after(1000, self.update_instance_names)
 
     def start_script(self) -> None:
-        start(self.id, 'Seers Woodcutter')
-        instance_name = self.window_select.get()
-        adb_port = get_adb_port_for_instance(instance_name)
         window_name = self.window_select.get()
-        try:
-            # run_script(
-            #     self.id, 
-            #     500, 
-            #     adb_port, 
-            #     self.script_select.get(), 
-            #     window_name
-            # )
+        script_name = self.script_select.get()
+        adb_port = get_adb_port_for_instance(window_name)
+        script_started = False
+        request_needed = False
+        if script_exists(script_name):
+            print('Script', script_name, 'exists...')
+            container = get_script_container(script_name)
+            client_version = container.version
+            server_version = get_script_version(script_name)
+            request_needed = client_version < server_version
+            if request_needed:
+                remove_script_container(script_name)
+            else:
+                script_started = start(self.id, script_name, adb_port, window_name)
+        else:
+            request_needed = True
+        if request_needed:
+            send_message('request_script', {'type': 'full', 'name': script_name})
+            def wait_and_start() -> None:
+                nonlocal script_started
+                while not script_exists(script_name):
+                    time.sleep(1)
+                script_started = start(self.id, script_name, adb_port, window_name)
+            thread = threading.Thread(target=wait_and_start)
+            thread.start()
+        if script_started:
+            print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             self.start_button.configure(state='disabled')
             self.pause_button.configure(state='normal')
             self.stop_button.configure(state='normal')
             self.profile_select.configure(state='disabled')
             self.script_select.configure(state='disabled')
             self.window_select.configure(state='disabled')
-        except Exception as e:
-            print('Error:', e)
-            messagebox.showerror('Error', 'Error running script!')
-            return
-
-        print(get_adb_port_for_instance(instance_name))
-        print(f'Start instance: {self.id}')
-        print('Window Selected:', self.window_select.get())
 
     def pause_script(self) -> None:
         # script = get_running_script(self.id)
