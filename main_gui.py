@@ -12,11 +12,13 @@ from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_instance
 )
+from settings import RUN_LOCAL
 from scripts.script_handler import (
     stop,
     start,
-    get_available_scripts, 
-    script_exists, 
+    script_exists,
+    start_from_local,
+    get_available_scripts,
     get_script_container, 
     get_script_version,
     remove_script_container,
@@ -61,10 +63,10 @@ class BotInstance:
         self.frame.after(1000, self.update_instance_names)
 
     def start_script(self) -> None:
+        need_to_wait = False
         window_name = self.window_select.get()
         script_name = self.script_select.get()
         adb_port = get_adb_port_for_instance(window_name)
-        need_to_wait = False
 
         def set_buttons() -> None:
             self.start_button.configure(state='disabled')
@@ -74,29 +76,75 @@ class BotInstance:
             self.script_select.configure(state='disabled')
             self.window_select.configure(state='disabled')
 
-        if script_exists(script_name):
-            container = get_script_container(script_name)
-            client_version = container.version
-            server_version = get_script_version(script_name)
-            if client_version < server_version:
-                remove_script_container(script_name)
-                need_to_wait = True
-            else:
-                if start(self.id, script_name, adb_port, window_name):
-                    set_buttons()
-                return
+        if RUN_LOCAL:
+            print('Starting local script:', script_name, '...')
+            if start_from_local(self.id, script_name, adb_port, window_name):
+                set_buttons()
         else:
-            need_to_wait = True
+            if script_exists(script_name):
+                container = get_script_container(script_name)
+                client_version = container.version
+                server_version = get_script_version(script_name)
+                if client_version < server_version:
+                    remove_script_container(script_name)
+                    need_to_wait = True
+                else:
+                    if start(self.id, script_name, adb_port, window_name):
+                        set_buttons()
+                    return
+            else:
+                need_to_wait = True
 
-        if need_to_wait:
-            send_message('request_script', {'type': 'full', 'name': script_name})
-            def wait_and_start() -> None:
-                while not script_exists(script_name):
-                    time.sleep(1)
-                if start(self.id, script_name, adb_port, window_name):
-                    set_buttons()
-            thread = threading.Thread(target=wait_and_start)
-            thread.start()
+            if need_to_wait:
+                send_message('request_script', {'type': 'full', 'name': script_name})
+                
+                def wait_and_start() -> None:
+                    while not script_exists(script_name):
+                        time.sleep(1)
+                    if start(self.id, script_name, adb_port, window_name):
+                        set_buttons()
+
+                thread = threading.Thread(target=wait_and_start)
+                thread.start()
+
+
+    # def start_script2(self) -> None:
+    #     window_name = self.window_select.get()
+    #     script_name = self.script_select.get()
+    #     adb_port = get_adb_port_for_instance(window_name)
+    #     need_to_wait = False
+
+    #     def set_buttons() -> None:
+    #         self.start_button.configure(state='disabled')
+    #         self.pause_button.configure(state='normal')
+    #         self.stop_button.configure(state='normal')
+    #         self.profile_select.configure(state='disabled')
+    #         self.script_select.configure(state='disabled')
+    #         self.window_select.configure(state='disabled')
+
+    #     if script_exists(script_name):
+    #         container = get_script_container(script_name)
+    #         client_version = container.version
+    #         server_version = get_script_version(script_name)
+    #         if client_version < server_version:
+    #             remove_script_container(script_name)
+    #             need_to_wait = True
+    #         else:
+    #             if start(self.id, script_name, adb_port, window_name):
+    #                 set_buttons()
+    #             return
+    #     else:
+    #         need_to_wait = True
+
+    #     if need_to_wait:
+    #         send_message('request_script', {'type': 'full', 'name': script_name})
+    #         def wait_and_start() -> None:
+    #             while not script_exists(script_name):
+    #                 time.sleep(1)
+    #             if start(self.id, script_name, adb_port, window_name):
+    #                 set_buttons()
+    #         thread = threading.Thread(target=wait_and_start)
+    #         thread.start()
 
     def pause_script(self) -> None:
         # script = get_running_script(self.id)

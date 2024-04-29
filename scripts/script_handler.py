@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import types
 import requests
 import importlib
 import uiautomator2 as u2
@@ -65,25 +66,43 @@ def close_adb_connection(window_name: str) -> None:
         del open_adb_connections[window_name]
 
 def is_adb_connected(window_name: str) -> bool:
-    return window_name in open_adb_connections
+    return window_name in open_adb_connections\
 
 def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
     global running_scripts
     adb_device = None
-    print('Starting Script:', id, name, adb_port, window_name, '...')
+    if not RUN_LOCAL:
+        container: ScriptContainer = script_containers[name]
+        module_ = container.file_name
+        class_ = container.class_
+        source = str(container.source).encode('utf-8')
+        model = container.model
+        templates = container.templates
+
+        script_module = types.ModuleType(module_)
+        exec(source, script_module.__dict__)
+        script_class = getattr(script_module, class_)
+
+
+def start_from_local(id: int, name: str, adb_port: int, window_name: str) -> bool:
+    global running_scripts
+    adb_device = None
     if RUN_LOCAL:
         if not window_name in open_adb_connections:
-            adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
             try:
+                print('ADB Port:', adb_port)
+                adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
                 adb_device.app_current()
             except Exception as e:
                 messagebox.showerror('Error', f'Error connecting to {window_name}!')
+                print('ADB Error:', e)
                 return False
             new_adb_connection(window_name)
         else:
             messagebox.showerror('Error', 'Another script is already connected to this window!')
             return False
         print('Connected to', window_name, '...')
+
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
             module_name = scripts[name]['module']   
