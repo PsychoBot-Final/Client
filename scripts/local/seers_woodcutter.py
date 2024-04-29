@@ -12,7 +12,7 @@ class SeersWoodcutter(BaseScript):
         self.main_thread.start()
 
     def run(self) -> None:
-        while True:
+        while self.main_thread.is_running():
             mouse.click()
             sleep(1)
 

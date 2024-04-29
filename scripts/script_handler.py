@@ -16,6 +16,7 @@ from scripts.script_container import ScriptContainer
 running_scripts = {}
 script_containers = {}
 available_scripts = []
+open_adb_connections = {}
 
 def remove_script_container(name: str) -> None:
     global script_containers
@@ -54,19 +55,35 @@ def get_script_version(name: str) -> float:
    response = request.json()
    return float(response['version'])
 
-# def get_available_scripts() -> list:
-#     return available_scripts
+def new_adb_connection(window_name: str) -> None:
+    global open_adb_connections
+    open_adb_connections[window_name] = True
+
+def close_adb_connection(window_name: str) -> None:
+    global open_adb_connections
+    if window_name in open_adb_connections:
+        del open_adb_connections[window_name]
+
+def is_adb_connected(window_name: str) -> bool:
+    return window_name in open_adb_connections
 
 def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
     global running_scripts
+    adb_device = None
     print('Starting Script:', id, name, adb_port, window_name, '...')
     if RUN_LOCAL:
-        adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
-        try:
-            adb_device.app_current()
-        except Exception as e:
-            messagebox.showerror('Error', f'Error connecting to {window_name}!')
+        if not window_name in open_adb_connections:
+            adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
+            try:
+                adb_device.app_current()
+            except Exception as e:
+                messagebox.showerror('Error', f'Error connecting to {window_name}!')
+                return False
+            new_adb_connection(window_name)
+        else:
+            messagebox.showerror('Error', 'Another script is already connected to this window!')
             return False
+        print('Connected to', window_name, '...')
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
             module_name = scripts[name]['module']   
@@ -91,7 +108,10 @@ def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
                 return True
 
 def stop(id: int) -> None:
-    ...
+    if id in running_scripts:
+        instance: BaseScript = running_scripts[id]
+        instance.stop()
+        del running_scripts[id]
 
 def pause(id: int) -> None:
     ...
