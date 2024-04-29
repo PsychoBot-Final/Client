@@ -15,9 +15,9 @@ from emulators.bluestacks import (
 from settings import RUN_LOCAL
 from scripts.script_handler import (
     stop,
-    start,
     script_exists,
     start_from_local,
+    start_from_server,
     get_available_scripts,
     get_script_container, 
     get_script_version,
@@ -89,7 +89,7 @@ class BotInstance:
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
-                    if start(self.id, script_name, adb_port, window_name):
+                    if start_from_server(self.id, script_name, adb_port, window_name):
                         set_buttons()
                     return
             else:
@@ -101,7 +101,7 @@ class BotInstance:
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
                         time.sleep(1)
-                    if start(self.id, script_name, adb_port, window_name):
+                    if start_from_server(self.id, script_name, adb_port, window_name):
                         set_buttons()
 
                 thread = threading.Thread(target=wait_and_start)

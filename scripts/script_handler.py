@@ -68,10 +68,21 @@ def close_adb_connection(window_name: str) -> None:
 def is_adb_connected(window_name: str) -> bool:
     return window_name in open_adb_connections\
 
-def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
+def start_from_server(id: int, name: str, adb_port: int, window_name: str) -> bool:
     global running_scripts
     adb_device = None
     if not RUN_LOCAL:
+        if not window_name in open_adb_connections:
+            try:
+                adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
+                adb_device.app_current()
+            except Exception as e:
+                messagebox.showerror('Error', f'Error connecting to {window_name}!')
+                return False
+            new_adb_connection(window_name)
+        else:
+            messagebox.showerror('Error', 'Another script is already connected to this window!')
+            return False
         container: ScriptContainer = script_containers[name]
         module_ = container.file_name
         class_ = container.class_
@@ -83,6 +94,16 @@ def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
         exec(source, script_module.__dict__)
         script_class = getattr(script_module, class_)
 
+        script_instance: BaseScript = script_class(
+            adb_device,
+            name,
+            window_name
+        )
+
+        running_scripts[id] = script_instance
+        running_scripts[id].start()
+        return True
+
 
 def start_from_local(id: int, name: str, adb_port: int, window_name: str) -> bool:
     global running_scripts
@@ -90,7 +111,6 @@ def start_from_local(id: int, name: str, adb_port: int, window_name: str) -> boo
     if RUN_LOCAL:
         if not window_name in open_adb_connections:
             try:
-                print('ADB Port:', adb_port)
                 adb_device = u2.connect(f'{LOCAL_HOST}:{adb_port}')
                 adb_device.app_current()
             except Exception as e:
