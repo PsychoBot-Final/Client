@@ -2,16 +2,19 @@ import os
 import sys
 import json
 import types
+import base64
+import zipfile
+import tempfile
 import requests
 import importlib
 import uiautomator2 as u2
 from base64 import b64decode
 from tkinter import messagebox
 from constants import LOCAL_HOST
-from utils import get_resource_path
 from scripts.base_scipt import BaseScript
 from settings import RUN_LOCAL, WEB_SERVER_URL
 from scripts.script_container import ScriptContainer
+from utils import get_resource_path, unzip_templates
 
 
 running_scripts = {}
@@ -33,16 +36,18 @@ def receive_script(data) -> None:
     script_data = data['data']
     script_data = str(script_data).split('|')
     source = b64decode(script_data[0]).decode('utf-8')
-    model = b64decode(script_data[1])
-    templates = b64decode(script_data[2])
+    model_data = b64decode(script_data[1])
+    templates_data = b64decode(script_data[2])
+    unzip_templates(templates_data)
     script_containers[name] = ScriptContainer(
         version=float(data['version']),
         file_name=data['file_name'],
         class_=data['class'],
         source=source,
-        model=model,
-        templates=templates
+        model=model_data,
+        templates=templates_data
     )
+    
 
 def script_exists(name: str) -> bool:
     return name in script_containers
