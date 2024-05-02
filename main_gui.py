@@ -15,15 +15,17 @@ from emulators.bluestacks import (
 from settings import RUN_LOCAL
 from scripts.script_handler import (
     stop,
+    start,
+    pause,
     script_exists,
-    start_from_local,
-    start_from_server,
+    is_script_paused,
+    remove_temp_model,
     get_available_scripts,
     get_script_container, 
     get_script_version,
-    remove_script_container,
-    close_adb_connection
+    remove_script_container
 )
+from emulators.adb_handler import close_adb_connection
 from client.client import send_message
 
 ctk.set_appearance_mode('dark')
@@ -77,8 +79,8 @@ class BotInstance:
             self.window_select.configure(state='disabled')
 
         if RUN_LOCAL:
-            print('Starting local script:', script_name, '...')
-            if start_from_local(self.id, script_name, adb_port, window_name):
+            if start(self.id, script_name, adb_port, window_name):
+                print('Starting local script:', script_name, '...')
                 set_buttons()
         else:
             if script_exists(script_name):
@@ -86,10 +88,11 @@ class BotInstance:
                 client_version = container.version
                 server_version = get_script_version(script_name)
                 if client_version < server_version:
+                    remove_temp_model(script_name)
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
-                    if start_from_server(self.id, script_name, adb_port, window_name):
+                    if start(self.id, script_name, adb_port, window_name):
                         set_buttons()
                     return
             else:
@@ -101,18 +104,17 @@ class BotInstance:
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
                         time.sleep(1)
-                    if start_from_server(self.id, script_name, adb_port, window_name):
+                    if start(self.id, script_name, adb_port, window_name):
                         set_buttons()
 
                 thread = threading.Thread(target=wait_and_start)
                 thread.start()
                 
     def pause_script(self) -> None:
-        # script = get_running_script(self.id)
-        # script.pause_script()
-        # is_paused = script.is_script_paused()
-        # self.pause_button.configure(text='Pause' if not is_paused else 'Resume')
-        ...
+        pause(self.id)
+        is_paused = is_script_paused(self.id)
+        button_text = 'Resume' if is_paused else 'Pause'
+        self.pause_button.configure(text=button_text)
 
     def stop_script(self) -> None:
         stop(self.id)

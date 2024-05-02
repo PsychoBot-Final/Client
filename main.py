@@ -2,6 +2,8 @@ import sys
 import json
 import time
 import requests
+from test import hash_all_files
+from util import get_resource_path
 from datetime import datetime
 from main_gui import MainGUI
 from PyQt5.QtWidgets import QMessageBox
@@ -59,7 +61,7 @@ class DiscordWindow(QMainWindow):
 
     def loadAuthPage(self):
         print('WEB SERVER URL:', WEB_SERVER_URL)
-        self.webview.load(QUrl(f'http://{WEB_SERVER_URL}/?auth_key=1234'))
+        self.webview.load(QUrl(f'http://{WEB_SERVER_URL}/?auth_key=12345'))
         self.webview.loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self):
@@ -88,7 +90,10 @@ class DiscordWindow(QMainWindow):
             set_user_id(user_id)
             set_instances(instances)
             set_expiry_date(expiry_date_str)
+            #
             connect_to_server()
+            # print(hash_all_files(get_resource_path('')))
+            #
             request_script('names', {})
             request_api()
             self.setVisible(False)

@@ -1,12 +1,4 @@
 {
-    "Agility Pyramid": {
-        "module": "agility_pyramid",
-        "class": "AgilityPyramid"
-    },
-    "Blast Furnace": {
-        "module": "blast_furnace",
-        "class": "BlastFurnace"
-    },
     "Seers Woodcutter": {
         "module": "seers_woodcutter",
         "class": "SeersWoodcutter"

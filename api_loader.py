@@ -6,12 +6,10 @@ modules = {}
 
 def receive_api(data) -> None:
     global modules
-    print(data)
     files = data['files']
     for file in files:
-        filename = file['filename']
         code = b64decode(file['content']).decode('utf-8')
-        module_name = str(filename).replace('.py', '')
+        module_name = str(file['filename']).replace('.py', '')
         spec = importlib.util.spec_from_loader(module_name, loader=None)
         module = importlib.util.module_from_spec(spec)
         exec(code, module.__dict__)

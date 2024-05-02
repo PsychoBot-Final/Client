@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow
 from user import set_user_authenticated
 from api_loader import receive_api
 from scripts.script_handler import recieve_script_names, receive_script
+from util import get_resource_path
 
 
 con = socketio.Client()
@@ -15,6 +16,9 @@ def connect_to_server() -> None:
     con.on('full_script', handler=receive_script)
     con.on('api_files', handler=receive_api)
     con.connect(f'http://{WEB_SERVER_URL}/?user_id={get_id()}')
+
+def verify_integrity() -> None:
+    ...
 
 def request_script(type: str, name: str) -> None:
     send_message('request_script', {'type': type, 'name': name})
