@@ -11,7 +11,7 @@ class SeersWoodcutter(BaseScript):
 
     def start(self) -> None:
         # self.load_templates()
-        self.load_model(model_path='./seers_woodcutter.pt')
+        self.load_model(model_path='./scripts/local/models/seers_woodcutter.pt')
         self.main_thread.start()
         return True
 

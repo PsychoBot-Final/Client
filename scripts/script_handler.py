@@ -23,12 +23,12 @@ available_scripts = []
 
 def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
     adb_device = None
+    try:
+        adb_device = connect_to_window(window_name, adb_port)
+    except ADBError as e:
+        messagebox.showerror('Connection Error', e)
+        return False
     if RUN_LOCAL:
-        try:
-            adb_device = connect_to_window(window_name, adb_port)
-        except ADBError as e:
-            messagebox.showerror('Connection Error', e)
-            return False
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
             module_name = scripts[name]['module']   
@@ -39,18 +39,13 @@ def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
             with open(get_resource_path(f'scripts/local/{module_name}.py'), 'rb') as file:
                 source_bytes = file.read()
                 source = str(source_bytes).encode('utf-8')
-                class_name = str(scripts[name]['class'])
+                module_class = str(scripts[name]['class'])
                 exec(source, module.__dict__)
-                script_class = getattr(module, class_name)
+                script_class = getattr(module, module_class)
                 script_instance: BaseScript = script_class(adb_device, name, window_name)
                 running_scripts[id] = script_instance
                 return running_scripts[id].start()
     else:
-        try:
-            adb_device = connect_to_window(window_name, adb_port)
-        except ADBError as e:
-            messagebox.showerror('Connection Error', e)
-            return False
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
             file_name = container.file_name
