@@ -90,9 +90,9 @@ class BaseScript(ABC):
         self.send_adb_input(f'input tap {abs_x} {abs_y}')
 
     def click_hold_point(self, abs_x: int, abs_y: int, duration: float) -> None:
-        self.send_adb_input(f'input touchscreen swipe {abs_x} {abs_y} {abs_x} {abs_y} {duration}')
+        self.click_hold_swipe(abs_x, abs_y, abs_x, abs_y, duration)
 
-    def click_hold_swipe(self, abs_x: int, abs_y: int, to_abs_x: int, to_abs_y: int, duration: int) -> None:
+    def click_hold_swipe(self, abs_x: int, abs_y: int, to_abs_x: int, to_abs_y: int, duration: float) -> None:
         self.send_adb_input(f'input touchscreen swipe {abs_x} {abs_y} {to_abs_x} {to_abs_y} {duration}')
 
     def send_keyboard_text(self, text: str, click_enter: bool=False) -> None:
