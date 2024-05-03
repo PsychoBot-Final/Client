@@ -5,7 +5,7 @@ from win_cap import WinCap
 from uiautomator2 import Device
 from abc import ABC, abstractmethod
 from threading import Thread, Event
-
+from error_handler import ADBError
 
 class ScriptContainer:
     def __init__(self, version: float, file_name: str, module_class: str, source: str, model_path: str, templates_path: str) -> None:
@@ -80,6 +80,35 @@ class BaseScript(ABC):
     def kill_script_threads(self) -> None:
         for thread in self.script_threads:
             thread.stop()
+
+    def send_adb_input(self, cmd: str) -> None:
+        if not self.adb_device:
+            raise ADBError('Device not registered...', code=5)
+        self.adb_device.shell(cmd)
+
+    def click_point(self, abs_x, abs_y) -> None:
+        self.send_adb_input(f'input tap {abs_x} {abs_y}')
+
+    def click_hold_point(self, abs_x: int, abs_y: int, duration: float) -> None:
+        self.send_adb_input(f'input touchscreen swipe {abs_x} {abs_y} {abs_x} {abs_y} {duration}')
+
+    def click_hold_swipe(self, abs_x: int, abs_y: int, to_abs_x: int, to_abs_y: int, duration: int) -> None:
+        self.send_adb_input(f'input touchscreen swipe {abs_x} {abs_y} {to_abs_x} {to_abs_y} {duration}')
+
+    def send_keyboard_text(self, text: str, click_enter: bool=False) -> None:
+        self.send_adb_input(
+            f'input text "{text}"'
+            if not click_enter
+            else f'input text "{text}" && input keyevent KEYCODE_ENTER'
+        )
+
+    def send_keyboard_input(self, type: str) -> None:
+        types = {
+            'SPACE': 'KEYCODE_SPACE',
+            'ESCAPE': 'KEYCODE_ESCAPE',
+            'BACKSPACE': 'KEYCODE_DEL'
+        }
+        self.send_adb_input(f'input keyevent {types[type]}')
 
     def load_model(self, model_path=None, multi_label=False) -> None:
         path_to_use = model_path if model_path is not None else self.model_path
