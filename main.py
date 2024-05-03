@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import time
@@ -8,7 +9,7 @@ from datetime import datetime
 from main_gui import MainGUI
 from PyQt5.QtWidgets import QMessageBox
 from client.client import connect_to_server, request_script, request_api
-from constants import BOT_VERSION, ACCESS_DENIED
+from constants import BOT_VERSION, ACCESS_DENIED, HOME_DIR, BOT_DIR_PATH, TEMPLATES_DIR_PATH
 from settings import WEB_SERVER_URL
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDesktopWidget
@@ -115,6 +116,11 @@ class DiscordWindow(QMainWindow):
     def closeEvent(self, event):
         event.accept()
 
+def init() -> None:
+    os.makedirs(BOT_DIR_PATH, exist_ok=True)
+    os.makedirs(TEMPLATES_DIR_PATH, exist_ok=True)
+
 if __name__ == "__main__":
+    init()
     app = DiscordApp(sys.argv)
     app.run()
