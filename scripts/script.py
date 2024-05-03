@@ -6,6 +6,7 @@ from uiautomator2 import Device
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from error_handler import ADBError
+from constants import TEMPLATES_DIR_PATH
 
 class ScriptContainer:
     def __init__(self, version: float, file_name: str, module_class: str, source: str, model_path: str, templates_path: str) -> None:
@@ -119,8 +120,8 @@ class BaseScript(ABC):
             ...
         self.model.multi_label = multi_label
     
-    def load_templates(self, templates_path=None) -> None:
-        path_to_use = templates_path if templates_path is not None else self.templates_path
+    def load_templates(self, templates_path: str=None) -> None:
+        path_to_use = f'{TEMPLATES_DIR_PATH}/{templates_path}' if templates_path is not None else self.templates_path
         for t in os.listdir(path_to_use):
             name, extension = os.path.splitext(t)
             if extension.lower() in ['.png', '.jpg', '.bmp']:

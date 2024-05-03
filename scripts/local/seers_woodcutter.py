@@ -10,7 +10,7 @@ class SeersWoodcutter(BaseScript):
         super().__init__(adb_device, script_name, window_name, templates_path, model_path)
 
     def start(self) -> None:
-        # self.load_templates()
+        self.load_templates()
         self.load_model(model_path='./scripts/local/models/seers_woodcutter.pt')
         self.main_thread.start()
         return True
