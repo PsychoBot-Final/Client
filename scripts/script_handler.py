@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import types
+import tempfile
 import requests
 import importlib
 from base64 import b64decode
@@ -9,7 +10,6 @@ from tkinter import messagebox
 from error_handler import ADBError
 from util import get_resource_path
 from settings import RUN_LOCAL, WEB_SERVER_URL
-from scripts.models.models import create_temp_model
 from emulators.adb_handler import connect_to_window
 from scripts.script import ScriptContainer, BaseScript
 from scripts.templates.templates import unzip_templates
@@ -75,13 +75,11 @@ def is_script_paused(id: int) -> bool:
         instance: BaseScript = running_scripts[id]
         return instance.is_script_paused()
 
-
-
-
-
-
-
-
+def create_temp_model(model_data: bytes) -> str:
+    with tempfile.NamedTemporaryFile(suffix='.pt', delete=False) as model_file:
+        model_file.write(model_data)
+        temp_model_path = model_file.name
+    return temp_model_path
 
 def get_temp_model_path(script_name: str) -> any:
     if script_name in script_containers:

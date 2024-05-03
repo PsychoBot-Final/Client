@@ -23,7 +23,7 @@ class SeersWoodcutter(BaseScript):
             screenshot = self.win_cap.get_screenshot()
             if screenshot is None:
                 continue
-            mouse.click()
+            self.click_point(1, 1)
             sleep(1)
 
     def stop(self) -> None:
