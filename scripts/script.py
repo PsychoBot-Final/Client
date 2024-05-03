@@ -1,11 +1,20 @@
 import os
-import cv2 as cv
 import torch
+import cv2 as cv
 from win_cap import WinCap
-from threading import Thread, Event
 from uiautomator2 import Device
 from abc import ABC, abstractmethod
+from threading import Thread, Event
 
+
+class ScriptContainer:
+    def __init__(self, version: float, file_name: str, module_class: str, source: str, model_path: str, templates_path: str) -> None:
+        self.version = version
+        self.file_name = file_name
+        self.module_class = module_class
+        self.source = source
+        self.model_path = model_path
+        self.templates_path = templates_path
 
 class ScriptThread:
     def __init__(self, func) -> None:
@@ -67,7 +76,7 @@ class BaseScript(ABC):
         script_thread = ScriptThread(func)
         self.script_threads.append(script_thread)
         return script_thread
-    
+
     def kill_script_threads(self) -> None:
         for thread in self.script_threads:
             thread.stop()
@@ -80,7 +89,6 @@ class BaseScript(ABC):
         except Exception as _:
             ...
         self.model.multi_label = multi_label
-        return self.model
     
     def load_templates(self, templates_path=None) -> None:
         path_to_use = templates_path if templates_path is not None else self.templates_path

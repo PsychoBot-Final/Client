@@ -10,7 +10,7 @@ from tkinter.font import Font
 from user import get_instances
 from emulators.bluestacks import (
     get_bluestacks_windows, 
-    get_adb_port_for_instance
+    get_adb_port_for_window
 )
 from settings import RUN_LOCAL
 from scripts.script_handler import (
@@ -68,7 +68,7 @@ class BotInstance:
         need_to_wait = False
         window_name = self.window_select.get()
         script_name = self.script_select.get()
-        adb_port = get_adb_port_for_instance(window_name)
+        adb_port = get_adb_port_for_window(window_name)
 
         def set_buttons() -> None:
             self.start_button.configure(state='disabled')

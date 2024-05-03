@@ -5,7 +5,6 @@ from base64 import b64decode
 modules = {}
 
 def receive_api(data) -> None:
-    global modules
     files = data['files']
     for file in files:
         code = b64decode(file['content']).decode('utf-8')

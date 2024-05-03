@@ -8,12 +8,10 @@ from base64 import b64decode
 from tkinter import messagebox
 from error_handler import ADBError
 from util import get_resource_path
-from scripts.base_scipt import BaseScript
 from settings import RUN_LOCAL, WEB_SERVER_URL
 from scripts.models.models import create_temp_model
 from emulators.adb_handler import connect_to_window
-from scripts.script_container import ScriptContainer
-from constants import LOCAL_HOST, TEMPLATES_DIR_PATH
+from scripts.script import ScriptContainer, BaseScript
 from scripts.templates.templates import unzip_templates
 
 

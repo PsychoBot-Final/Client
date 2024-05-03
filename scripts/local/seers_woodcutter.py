@@ -2,7 +2,7 @@ import mouse # type: ignore
 import cv2 as cv
 from time import sleep
 from uiautomator2 import Device
-from scripts.base_scipt import BaseScript
+from scripts.script import BaseScript
 
 
 class SeersWoodcutter(BaseScript):

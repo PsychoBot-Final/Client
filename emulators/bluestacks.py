@@ -31,10 +31,10 @@ def get_bluestacks_windows() -> dict:
     
     return result
 
-def get_adb_port_for_instance(
-    instance_name: str
+def get_adb_port_for_window(
+    window_name: str
 ) -> int:
     """
     Returns ADB port for bluestacks instance.
     """
-    return int(get_bluestacks_windows()[instance_name])
+    return int(get_bluestacks_windows()[window_name])
