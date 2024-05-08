@@ -19,4 +19,6 @@ BOT_DIR_PATH = os.path.join(HOME_DIR, '.psychobot')
 TEMPLATES_DIR_PATH = os.path.join(BOT_DIR_PATH, 'templates')
 VERSIONS_FILE_PATH = os.path.join(BOT_DIR_PATH, 'versions.json')
 
+VALID_TEMPLATE_EXTENSIONS = ['.jpg', '.png', '.bmp']
+
 BOT_VERSION = 1.0
