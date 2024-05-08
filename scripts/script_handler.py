@@ -43,7 +43,6 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFr
                 script_class = getattr(module, module_class)
                 script_instance: BaseScript = script_class(adb_device, name, window_name, parent)
                 script_instances[id] = script_instance
-                # script_instances[id].create_gui(parent)
     else:
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
@@ -58,7 +57,6 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFr
             script_class = getattr(script_module, module_class)
             script_instance: BaseScript = script_class(adb_device, name, window_name, parent, templates_path, model_path)
             script_instances[id] = script_instance
-            # script_instances[id].create_gui(parent)
         
 def stop(id: int) -> None:
     if id in script_instances:

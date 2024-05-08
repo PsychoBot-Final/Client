@@ -139,8 +139,8 @@ class BaseScript(ABC):
             ...
         self.model.multi_label = multi_label
     
-    def load_templates(self, templates_path: str=None) -> None:
-        path_to_use = f'{TEMPLATES_DIR_PATH}/{templates_path}' if templates_path is not None else self.templates_path
+    def load_templates(self, dir_name: str=None) -> None:
+        path_to_use = f'{TEMPLATES_DIR_PATH}/{dir_name}' if dir_name is not None else self.templates_path
         for t in os.listdir(path_to_use):
             name, extension = os.path.splitext(t)
             if extension.lower() in ['.png', '.jpg', '.bmp']:
