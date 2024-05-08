@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from error_handler import ADBError
 from constants import TEMPLATES_DIR_PATH
+import customtkinter as ctk
+
 
 class ScriptContainer:
     def __init__(self, version: float, file_name: str, module_class: str, source: str, model_path: str, templates_path: str) -> None:
@@ -39,12 +41,15 @@ class BaseScript(ABC):
         adb_device: Device,
         script_name: str,
         window_name: str,
+        parent: ctk.CTkFrame,
         templates_path: str=None,
         model_path: str=None,
     ) -> None:
         self.adb_device = adb_device
         self.script_name = script_name
         self.window_name = window_name
+        self.parent = parent
+        self.app = ctk.CTkToplevel(self.parent)
         self.templates = {}
         self.model = None
         self.win_cap = WinCap(self.window_name)
@@ -54,6 +59,10 @@ class BaseScript(ABC):
         self.script_threads = []
         self.main_thread = ScriptThread(self.run)
         self.script_threads.append(self.main_thread)
+
+    @abstractmethod
+    def create_gui(self, parent: ctk.CTkFrame) -> None:
+        ...
 
     @abstractmethod
     def start(self) -> bool:
@@ -81,6 +90,16 @@ class BaseScript(ABC):
     def kill_script_threads(self) -> None:
         for thread in self.script_threads:
             thread.stop()
+
+    def set_window_position(self, width, height):
+        screen_width = self.app.winfo_screenwidth()
+        screen_height = self.app.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.app.geometry(f"{width}x{height}+{x}+{y}")
+
+    def close_gui(self) -> None:
+        self.app.destroy()
 
     def send_adb_input(self, cmd: str) -> None:
         if not self.adb_device:

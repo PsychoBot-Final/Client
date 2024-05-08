@@ -1,5 +1,6 @@
 import sys
 import time
+import requests
 import threading
 from threading import Event
 import tkinter as tk
@@ -7,7 +8,7 @@ import customtkinter as ctk
 from tkinter import *
 from tkinter import messagebox, ttk
 from tkinter.font import Font
-from user import get_instances
+from user import get_instances, get_connection_status, set_connection_status
 from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_window
@@ -23,7 +24,9 @@ from scripts.script_handler import (
     get_available_scripts,
     get_script_container, 
     get_script_version,
-    remove_script_container
+    remove_script_container,
+    remove_all_temp_models,
+    stop_all_scripts
 )
 from emulators.adb_handler import close_adb_connection
 from client.client import send_message
@@ -38,19 +41,22 @@ class BotInstance:
         self.window_select = ctk.CTkOptionMenu(self.frame, values=list(get_bluestacks_windows().keys()))
         self.window_select.pack(side='left', padx=(10, 0), pady=10)
 
-        self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
-        self.profile_select.pack(side='left', padx=(10, 0), pady=10)
+        # self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
+        # self.profile_select.pack(side='left', padx=(10, 0), pady=10)
         
         self.script_select = ctk.CTkOptionMenu(self.frame, values=get_available_scripts())
         self.script_select.pack(side='left', padx=(10, 0), pady=10)
 
         self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
+        self.start_button.configure(fg_color='green', text_color='black', hover_color='#02640f', border_color='black', border_width=1)
         self.start_button.pack(side='left', padx=(10, 0), pady=10)
 
         self.pause_button = ctk.CTkButton(self.frame, width=70, text='Pause', command=self.pause_script)
+        self.pause_button.configure(fg_color='#ffff00', text_color='black', hover_color='#ffea00', border_color='black', border_width=1)
         self.pause_button.pack(side='left', padx=(10, 0), pady=10)
 
         self.stop_button = ctk.CTkButton(self.frame, width=70, text='Stop', command=self.stop_script)
+        self.stop_button.configure(fg_color='red', text_color='black', hover_color='#cd0000', border_color='black', border_width=1)
         self.stop_button.pack(side='left', padx=(10, 0), pady=10)
 
         view_screen = ctk.CTkButton(self.frame, width=60, height=60, text='VIEW', command=self.view_more)
@@ -64,6 +70,13 @@ class BotInstance:
 
         self.frame.after(1000, self.update_instance_names)
 
+    def disable(self) -> None:
+        for widget in self.frame.winfo_children():
+            try:
+                widget.configure(state="disabled")
+            except ctk.TkError:
+                ...
+
     def start_script(self) -> None:
         need_to_wait = False
         window_name = self.window_select.get()
@@ -74,14 +87,14 @@ class BotInstance:
             self.start_button.configure(state='disabled')
             self.pause_button.configure(state='normal')
             self.stop_button.configure(state='normal')
-            self.profile_select.configure(state='disabled')
+            # self.profile_select.configure(state='disabled')
             self.script_select.configure(state='disabled')
             self.window_select.configure(state='disabled')
 
         if RUN_LOCAL:
-            if start(self.id, script_name, adb_port, window_name):
-                print('Starting local script:', script_name, '...')
-                set_buttons()
+            start(self.id, script_name, adb_port, window_name, self.frame)
+            print('Starting local script:', script_name, '...')
+            set_buttons()
         else:
             if script_exists(script_name):
                 container = get_script_container(script_name)
@@ -92,8 +105,8 @@ class BotInstance:
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
-                    if start(self.id, script_name, adb_port, window_name):
-                        set_buttons()
+                    start(self.id, script_name, adb_port, window_name, self.frame)
+                    set_buttons()
                     return
             else:
                 need_to_wait = True
@@ -104,8 +117,8 @@ class BotInstance:
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
                         time.sleep(1)
-                    if start(self.id, script_name, adb_port, window_name):
-                        set_buttons()
+                    start(self.id, script_name, adb_port, window_name, self.frame)
+                    set_buttons()
 
                 thread = threading.Thread(target=wait_and_start)
                 thread.start()
@@ -122,7 +135,7 @@ class BotInstance:
         self.start_button.configure(state='normal')
         self.pause_button.configure(state='disabled')
         self.stop_button.configure(state='disabled')
-        self.profile_select.configure(state='normal')
+        # self.profile_select.configure(state='normal')
         self.script_select.configure(state='normal')
         self.window_select.configure(state='normal')
 
@@ -138,6 +151,8 @@ class BotInstance:
 
 class MainGUI:
     def __init__(self) -> None:
+        self.failed_connection_attemps = 0
+        self.instance_frames = {}
         self.num_instances = get_instances()
         self.app = ctk.CTk()
         self.create_ui()
@@ -154,6 +169,30 @@ class MainGUI:
         # client.send_message('check_version', {'version': 1.0})
         # self.app.after(1000, self.monitor_version)
 
+    def check_internet_connection(self) -> None:
+        try:
+            request = requests.get('https://www.google.com')
+            status_code = request.status_code
+            if status_code == 200:
+                self.failed_connection_attemps = 0
+            else:
+                raise requests.exceptions.RequestException
+        except requests.exceptions.RequestException:
+            self.failed_connection_attemps += 1
+            print('Internet connection lost, attemping to reconnect...')
+            if self.failed_connection_attemps > 2:
+                set_connection_status(False)
+        finally:
+            if not get_connection_status():
+                print('Connection has been lost, disabling bot...')
+                stop_all_scripts()
+                remove_all_temp_models()
+                messagebox.showerror(title='Connection Error', message='Please check your internet connection, restart the bot to continue!')
+                for _, instance in self.instance_frames.items():
+                    instance.disable()
+            else:
+                self.app.after(3000, self.check_internet_connection)
+
     def create_ui(self) -> None:
         self.app.title('PsychoBot')
         self.set_window_position(850, 745)
@@ -163,6 +202,7 @@ class MainGUI:
         self.create_bot_instances()
         # self.app.protocol("WM_DELETE_WINDOW", self.on_close)
         self.app.resizable(False, False)
+        self.app.after(3000, self.check_internet_connection)
         # self.app.after(1000, self.monitor_version)
         self.app.mainloop()
 
@@ -220,5 +260,4 @@ class MainGUI:
         notebook.add(self.settings_tab, text='Settings')
 
     def create_bot_instances(self) -> None:
-        allowed_instances = get_instances()
-        instances = {id: BotInstance(id, self.bot_tab_frame) for id in range(allowed_instances)}
+        self.instance_frames = {id: BotInstance(id, self.bot_tab_frame) for id in range(self.num_instances)}

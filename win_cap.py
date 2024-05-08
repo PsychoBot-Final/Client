@@ -70,6 +70,3 @@ def list_window_names():
             # print(hex(hwnd), win32gui.GetWindowText(hwnd))
     win32gui.EnumWindows(winEnumHandler, None)
     return all_windows
-
-
-print(list_window_names())

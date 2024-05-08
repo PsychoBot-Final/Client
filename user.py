@@ -2,6 +2,14 @@ user_id = None
 user_authenticated = None
 instances = None
 expiry_date = None
+connected = False
+
+def set_connection_status(flag: bool) -> None:
+    global connected
+    connected = flag
+
+def get_connection_status() -> bool:
+    return connected
 
 def set_expiry_date(
     expiry: str

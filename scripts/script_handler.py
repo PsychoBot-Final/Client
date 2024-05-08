@@ -9,23 +9,24 @@ from base64 import b64decode
 from tkinter import messagebox
 from error_handler import ADBError
 from util import get_resource_path
+import customtkinter as ctk
 from settings import RUN_LOCAL, WEB_SERVER_URL
 from emulators.adb_handler import connect_to_window
 from scripts.script import ScriptContainer, BaseScript
 from scripts.templates.templates import unzip_templates
 
 
-running_scripts = {}
+script_instances = {}
 script_containers = {}
 available_scripts = []
 
-def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
+def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFrame) -> None:
     adb_device = None
     try:
         adb_device = connect_to_window(window_name, adb_port)
     except ADBError as e:
         messagebox.showerror('Connection Error', e)
-        return False
+        return
     if RUN_LOCAL:
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
@@ -40,9 +41,9 @@ def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
                 module_class = str(scripts[name]['class'])
                 exec(source, module.__dict__)
                 script_class = getattr(module, module_class)
-                script_instance: BaseScript = script_class(adb_device, name, window_name)
-                running_scripts[id] = script_instance
-                return running_scripts[id].start()
+                script_instance: BaseScript = script_class(adb_device, name, window_name, parent)
+                script_instances[id] = script_instance
+                # script_instances[id].create_gui(parent)
     else:
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
@@ -55,25 +56,42 @@ def start(id: int, name: str, adb_port: int, window_name: str) -> bool:
             script_module = types.ModuleType(file_name)
             exec(source, script_module.__dict__)
             script_class = getattr(script_module, module_class)
-            script_instance: BaseScript = script_class(adb_device, name, window_name, templates_path, model_path)
-            running_scripts[id] = script_instance
-            return running_scripts[id].start()
+            script_instance: BaseScript = script_class(adb_device, name, window_name, parent, templates_path, model_path)
+            script_instances[id] = script_instance
+            # script_instances[id].create_gui(parent)
         
 def stop(id: int) -> None:
-    if id in running_scripts:
-        instance: BaseScript = running_scripts[id]
-        instance.stop()
-        del running_scripts[id]
+    if id in script_instances:
+        try:
+            instance: BaseScript = script_instances[id]
+            instance.close_gui()
+            instance.stop()
+        except RuntimeError as _:
+            ...
+        del script_instances[id]
 
 def pause(id: int) -> None:
-    if id in running_scripts:
-        instance: BaseScript = running_scripts[id]
+    if id in script_instances:
+        instance: BaseScript = script_instances[id]
         instance.pause_script()
 
 def is_script_paused(id: int) -> bool:
-    if id in running_scripts:
-        instance: BaseScript = running_scripts[id]
+    if id in script_instances:
+        instance: BaseScript = script_instances[id]
         return instance.is_script_paused()
+
+def stop_all_scripts() -> None:
+    for id, _ in script_instances.items():
+        try:
+            instance: BaseScript = script_instances[id]
+            instance.close_gui()
+            instance.stop()
+        except RuntimeError as _:
+            ...
+
+def remove_all_temp_models() -> None:
+    for id, container in script_containers.items():
+        os.unlink(container.model_path)
 
 def create_temp_model(model_data: bytes) -> str:
     with tempfile.NamedTemporaryFile(suffix='.pt', delete=False) as model_file:

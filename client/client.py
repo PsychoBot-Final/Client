@@ -3,7 +3,7 @@ from user import get_id
 from settings import WEB_SERVER_URL
 from tkinter import messagebox, ttk
 from PyQt5.QtWidgets import QMainWindow
-from user import set_user_authenticated
+from user import set_user_authenticated, set_connection_status
 from api_loader import receive_api
 from scripts.script_handler import recieve_script_names, receive_script
 from util import get_resource_path
@@ -33,14 +33,17 @@ def authenticated(flag: bool) -> None:
 @con.event
 def connect() -> None:
     print('User', get_id(), 'Connected...')
+    set_connection_status(True)
 
 @con.event
 def connect_error(data) -> None:
     print('Error connecting to server...')
+    set_connection_status(False)
 
 @con.event
 def disconnect() -> None:
     print('User', get_id(), 'Disconnected...')
+    set_connection_status(False)
 
 def send_message(event: str, data: any) -> None:
     try:
