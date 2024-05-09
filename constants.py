@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+PORT = os.environ.get('PORT')
 LOCAL_HOST = os.environ.get('LOCAL_HOST')
 LOCAL_SERVER_URL = os.environ.get('LOCAL_SERVER_URL')
 PUBLIC_SERVER_URL = os.environ.get('PUBLIC_SERVER_URL')

@@ -40,9 +40,6 @@ class BotInstance:
 
         self.window_select = ctk.CTkOptionMenu(self.frame, values=list(get_bluestacks_windows().keys()))
         self.window_select.pack(side='left', padx=(10, 0), pady=10)
-
-        # self.profile_select = ctk.CTkOptionMenu(self.frame, values=['Profile # 1', '2', '3'])
-        # self.profile_select.pack(side='left', padx=(10, 0), pady=10)
         
         self.script_select = ctk.CTkOptionMenu(self.frame, values=get_available_scripts())
         self.script_select.pack(side='left', padx=(10, 0), pady=10)
@@ -87,7 +84,6 @@ class BotInstance:
             self.start_button.configure(state='disabled')
             self.pause_button.configure(state='normal')
             self.stop_button.configure(state='normal')
-            # self.profile_select.configure(state='disabled')
             self.script_select.configure(state='disabled')
             self.window_select.configure(state='disabled')
 
@@ -135,7 +131,6 @@ class BotInstance:
         self.start_button.configure(state='normal')
         self.pause_button.configure(state='disabled')
         self.stop_button.configure(state='disabled')
-        # self.profile_select.configure(state='normal')
         self.script_select.configure(state='normal')
         self.window_select.configure(state='normal')
 

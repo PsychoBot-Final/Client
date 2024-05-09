@@ -62,12 +62,13 @@ class DiscordWindow(QMainWindow):
 
     def loadAuthPage(self):
         print('WEB SERVER URL:', WEB_SERVER_URL)
-        self.webview.load(QUrl(f'http://{WEB_SERVER_URL}/?auth_key=12345'))
+        self.webview.load(QUrl(f'http://{WEB_SERVER_URL}?auth_key=12345'))# f'http://{WEB_SERVER_URL}/?auth_key=12345'))
         self.webview.loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self):
         current_url = self.webview.url().toString()
-        user_verified_url = f'http://{WEB_SERVER_URL}/verified'
+        print('Current URL:', current_url)
+        user_verified_url = f'http://{WEB_SERVER_URL}/verified' # 'http://{WEB_SERVER_URL}/verified'
         if current_url == user_verified_url:
             self.webview.page().toPlainText(self.processUserDetails)
         elif ACCESS_DENIED in current_url:
@@ -93,7 +94,6 @@ class DiscordWindow(QMainWindow):
             set_expiry_date(expiry_date_str)
             #
             connect_to_server()
-            # print(hash_all_files(get_resource_path('')))
             #
             request_script('names', {})
             request_api()

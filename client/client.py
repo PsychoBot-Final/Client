@@ -1,6 +1,6 @@
 import socketio
 from user import get_id
-from settings import WEB_SERVER_URL
+from settings import WEB_SERVER_URL, PORT
 from tkinter import messagebox, ttk
 from PyQt5.QtWidgets import QMainWindow
 from user import set_user_authenticated, set_connection_status
@@ -15,7 +15,7 @@ def connect_to_server() -> None:
     con.on('script_names', handler=recieve_script_names)
     con.on('full_script', handler=receive_script)
     con.on('api_files', handler=receive_api)
-    con.connect(f'http://{WEB_SERVER_URL}/?user_id={get_id()}')
+    con.connect(f'http://{WEB_SERVER_URL}:{PORT}/?user_id={get_id()}')
 
 def verify_integrity() -> None:
     ...

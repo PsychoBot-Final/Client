@@ -2,12 +2,12 @@ import os
 import torch
 import cv2 as cv
 from win_cap import WinCap
+import customtkinter as ctk
 from uiautomator2 import Device
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from error_handler import ADBError
 from constants import TEMPLATES_DIR_PATH
-import customtkinter as ctk
 
 
 class ScriptContainer:
