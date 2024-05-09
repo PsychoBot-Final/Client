@@ -50,7 +50,7 @@ class DiscordWindow(QMainWindow):
         self.move(frame_geometry.topLeft())
 
     def verify_bot_version(self) -> None:
-        url = 'http://' + WEB_SERVER_URL + '/version/'
+        url = 'https://' + WEB_SERVER_URL + '/version/'
         request = requests.get(url)
         response = request.json()
         bot_version = float(response.get('bot-version'))
@@ -62,13 +62,13 @@ class DiscordWindow(QMainWindow):
 
     def loadAuthPage(self):
         print('WEB SERVER URL:', WEB_SERVER_URL)
-        self.webview.load(QUrl(f'http://{WEB_SERVER_URL}?auth_key=12345'))# f'http://{WEB_SERVER_URL}/?auth_key=12345'))
+        self.webview.load(QUrl(f'https://{WEB_SERVER_URL}?auth_key=12345'))# f'http://{WEB_SERVER_URL}/?auth_key=12345'))
         self.webview.loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self):
         current_url = self.webview.url().toString()
         print('Current URL:', current_url)
-        user_verified_url = f'http://{WEB_SERVER_URL}/verified' # 'http://{WEB_SERVER_URL}/verified'
+        user_verified_url = f'https://{WEB_SERVER_URL}/verified' # 'http://{WEB_SERVER_URL}/verified'
         if current_url == user_verified_url:
             self.webview.page().toPlainText(self.processUserDetails)
         elif ACCESS_DENIED in current_url:

@@ -15,7 +15,7 @@ def connect_to_server() -> None:
     con.on('script_names', handler=recieve_script_names)
     con.on('full_script', handler=receive_script)
     con.on('api_files', handler=receive_api)
-    con.connect(f'http://{WEB_SERVER_URL}:{PORT}/?user_id={get_id()}')
+    con.connect(f'https://{WEB_SERVER_URL}/?user_id={get_id()}')
 
 def verify_integrity() -> None:
     ...
