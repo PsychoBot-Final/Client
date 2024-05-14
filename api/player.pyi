@@ -1,7 +1,9 @@
 def test() -> None:
+    """ Test function # 1. """
     ...
 
 def test32() -> None:
+    """ Test function # 2. """
     ...
 
 def player_is_moving(screen_shot, min_delay: float) -> bool:
