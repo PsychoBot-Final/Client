@@ -19,6 +19,7 @@ from scripts.templates.templates import unzip_templates
 script_instances = {}
 script_containers = {}
 available_scripts = []
+script_modules = {}
 
 def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFrame) -> None:
     adb_device = None
@@ -43,6 +44,7 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFr
                 script_class = getattr(module, module_class)
                 script_instance: BaseScript = script_class(adb_device, name, window_name, parent)
                 script_instances[id] = script_instance
+                script_modules[id] = module_name
     else:
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
@@ -64,6 +66,11 @@ def stop(id: int) -> None:
             instance: BaseScript = script_instances[id]
             instance.close_gui()
             instance.stop()
+            if id in script_modules:
+                module_name = script_modules[id]
+                if module_name in sys.modules:
+                    del sys.modules[module_name]
+                    del script_modules[id]
         except RuntimeError as _:
             ...
         del script_instances[id]
