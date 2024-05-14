@@ -18,8 +18,8 @@ ACCESS_DENIED = os.environ.get('ACCESS_DENIED')
 HOME_DIR = os.path.expanduser('~')
 BOT_DIR_PATH = os.path.join(HOME_DIR, '.psychobot')
 TEMPLATES_DIR_PATH = os.path.join(BOT_DIR_PATH, 'templates')
-VERSIONS_FILE_PATH = os.path.join(BOT_DIR_PATH, 'versions.json')
 
 VALID_TEMPLATE_EXTENSIONS = ['.jpg', '.png', '.bmp']
+API_PACKAGE_NAME = 'api'
 
 BOT_VERSION = 1.0
