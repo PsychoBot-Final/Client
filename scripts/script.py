@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from error_handler import ADBError
 from constants import TEMPLATES_DIR_PATH
+from main_gui import BotInstance
 
 
 class ScriptContainer:
@@ -41,7 +42,7 @@ class BaseScript(ABC):
         adb_device: Device,
         script_name: str,
         window_name: str,
-        parent: ctk.CTkFrame,
+        parent: BotInstance,
         templates_path: str=None,
         model_path: str=None,
     ) -> None:
@@ -49,7 +50,9 @@ class BaseScript(ABC):
         self.script_name = script_name
         self.window_name = window_name
         self.parent = parent
+        self.frame = self.parent.frame
         self.app = ctk.CTkToplevel(self.parent)
+        self.app.protocol('WM_DELETE_WINDOW', parent.stop_script)
         self.templates = {}
         self.model = None
         self.win_cap = WinCap(self.window_name)

@@ -7,6 +7,7 @@ import tkinter as tk
 import customtkinter as ctk
 from tkinter import *
 from tkinter import messagebox, ttk
+from news import News
 from tkinter.font import Font
 from user import get_instances, get_connection_status, set_connection_status
 from emulators.bluestacks import (
@@ -88,7 +89,7 @@ class BotInstance:
             self.window_select.configure(state='disabled')
 
         if RUN_LOCAL:
-            start(self.id, script_name, adb_port, window_name, self.frame)
+            start(self.id, script_name, adb_port, window_name, self)
             print('Starting local script:', script_name, '...')
             set_buttons()
         else:
@@ -233,6 +234,10 @@ class MainGUI:
         self.top_frame = ctk.CTkFrame(self.app, corner_radius=15, height=55)
         self.top_frame.pack(side='top', fill='x', padx=10, pady=(10, 0))
         self.top_frame.configure(border_color='black', border_width=1)
+        #
+        # news = News(self.top_frame)
+        # self.news_label = ctk.CTkLabel(self.top_frame, text=f'News: Savi is a fuckin fag...', font=('Century Gothic', 14, 'bold'))
+        # self.news_label.pack(side='left', fill='x', padx=10, pady=(5, 5))
         #
         self.center_frame = ctk.CTkFrame(self.app, corner_radius=15)
         self.center_frame.pack(side='left', fill='both', expand=True, padx=10, pady=10)

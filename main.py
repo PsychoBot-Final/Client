@@ -36,7 +36,7 @@ class DiscordApp(QApplication):
 class DiscordWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PsychoBot - Authenticaion")
+        self.setWindowTitle("PsychoBot - Authentication")
         self.setGeometry(100, 100, 400, 650)
         self.centerWindow()
         self.webview = QWebEngineView()
@@ -62,13 +62,13 @@ class DiscordWindow(QMainWindow):
 
     def loadAuthPage(self):
         print('WEB SERVER URL:', WEB_SERVER_URL)
-        self.webview.load(QUrl(f'https://{WEB_SERVER_URL}?auth_key=12345'))# f'http://{WEB_SERVER_URL}/?auth_key=12345'))
+        self.webview.load(QUrl(f'https://{WEB_SERVER_URL}?auth_key=12345'))
         self.webview.loadFinished.connect(self.onLoadFinished)
 
     def onLoadFinished(self):
         current_url = self.webview.url().toString()
         print('Current URL:', current_url)
-        user_verified_url = f'https://{WEB_SERVER_URL}/verified' # 'http://{WEB_SERVER_URL}/verified'
+        user_verified_url = f'https://{WEB_SERVER_URL}/verified'
         if current_url == user_verified_url:
             self.webview.page().toPlainText(self.processUserDetails)
         elif ACCESS_DENIED in current_url:

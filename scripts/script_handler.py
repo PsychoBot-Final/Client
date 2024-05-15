@@ -14,6 +14,7 @@ from settings import RUN_LOCAL, WEB_SERVER_URL
 from emulators.adb_handler import connect_to_window
 from scripts.script import ScriptContainer, BaseScript
 from scripts.templates.templates import unzip_templates
+from main_gui import BotInstance
 
 
 script_instances = {}
@@ -21,7 +22,8 @@ script_containers = {}
 available_scripts = []
 script_modules = {}
 
-def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFrame) -> None:
+# def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFrame) -> None:
+def start(id: int, name: str, adb_port: int, window_name: str, parent: BotInstance) -> None:
     adb_device = None
     try:
         adb_device = connect_to_window(window_name, adb_port)
@@ -95,7 +97,7 @@ def stop_all_scripts() -> None:
             ...
 
 def remove_all_temp_models() -> None:
-    for id, container in script_containers.items():
+    for _, container in script_containers.items():
         os.unlink(container.model_path)
 
 def create_temp_model(model_data: bytes) -> str:
