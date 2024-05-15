@@ -14,7 +14,6 @@ from settings import RUN_LOCAL, WEB_SERVER_URL
 from emulators.adb_handler import connect_to_window
 from scripts.script import ScriptContainer, BaseScript
 from scripts.templates.templates import unzip_templates
-from main_gui import BotInstance
 
 
 script_instances = {}
@@ -22,14 +21,13 @@ script_containers = {}
 available_scripts = []
 script_modules = {}
 
-# def start(id: int, name: str, adb_port: int, window_name: str, parent: ctk.CTkFrame) -> None:
-def start(id: int, name: str, adb_port: int, window_name: str, parent: BotInstance) -> None:
+def start(id: int, name: str, adb_port: int, window_name: str, parent) -> None:
     adb_device = None
     try:
         adb_device = connect_to_window(window_name, adb_port)
     except ADBError as e:
         messagebox.showerror('Connection Error', e)
-        return
+        return False
     if RUN_LOCAL:
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
@@ -44,9 +42,10 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent: BotInstan
                 module_class = str(scripts[name]['class'])
                 exec(source, module.__dict__)
                 script_class = getattr(module, module_class)
-                script_instance: BaseScript = script_class(adb_device, name, window_name, parent)
+                script_instance: BaseScript = script_class(id, adb_device, name, window_name, parent)
                 script_instances[id] = script_instance
                 script_modules[id] = module_name
+                return True
     else:
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
@@ -59,8 +58,9 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent: BotInstan
             script_module = types.ModuleType(file_name)
             exec(source, script_module.__dict__)
             script_class = getattr(script_module, module_class)
-            script_instance: BaseScript = script_class(adb_device, name, window_name, parent, templates_path, model_path)
+            script_instance: BaseScript = script_class(id, adb_device, name, window_name, parent, templates_path, model_path)
             script_instances[id] = script_instance
+            return True
         
 def stop(id: int) -> None:
     if id in script_instances:

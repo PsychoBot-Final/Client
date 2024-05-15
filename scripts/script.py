@@ -38,6 +38,7 @@ class ScriptThread:
 class BaseScript(ABC):
     def __init__(
         self,
+        id: int,
         adb_device: Device,
         script_name: str,
         window_name: str,
@@ -45,13 +46,12 @@ class BaseScript(ABC):
         templates_path: str=None,
         model_path: str=None,
     ) -> None:
+        self.id = id
         self.adb_device = adb_device
         self.script_name = script_name
         self.window_name = window_name
         self.parent = parent
-        self.frame = self.parent.frame
-        self.app = ctk.CTkToplevel(self.parent)
-        self.app.protocol('WM_DELETE_WINDOW', parent.stop_script)
+        self.app = ctk.CTkToplevel(self.parent.frame)
         self.templates = {}
         self.model = None
         self.win_cap = WinCap(self.window_name)
@@ -61,6 +61,7 @@ class BaseScript(ABC):
         self.script_threads = []
         self.main_thread = ScriptThread(self.run)
         self.script_threads.append(self.main_thread)
+        self.app.protocol("WM_DELETE_WINDOW", self.on_close)
 
     @abstractmethod
     def create_gui(self, parent: ctk.CTkFrame) -> None:
@@ -99,6 +100,10 @@ class BaseScript(ABC):
         x = (screen_width // 2) - (width // 2)
         y = (screen_height // 2) - (height // 2)
         self.app.geometry(f"{width}x{height}+{x}+{y}")
+
+    def on_close(self) -> None:
+        self.parent.stop_script()
+        self.close_gui()
 
     def close_gui(self) -> None:
         self.app.destroy()

@@ -20,7 +20,7 @@ def receive_api(data: any) -> None:
         code = b64decode(file['content']).decode('utf-8')
         module_name = str(file['filename']).replace('.py', '')
         full_module_name = f"{API_PACKAGE_NAME}.{module_name}"
-        print(full_module_name)
+        # print(full_module_name)
         spec = importlib.util.spec_from_loader(full_module_name, loader=None)
         module = importlib.util.module_from_spec(spec)
         exec(code, module.__dict__)

@@ -89,9 +89,9 @@ class BotInstance:
             self.window_select.configure(state='disabled')
 
         if RUN_LOCAL:
-            start(self.id, script_name, adb_port, window_name, self)
-            print('Starting local script:', script_name, '...')
-            set_buttons()
+            if start(self.id, script_name, adb_port, window_name, self):
+                print('Starting local script:', script_name, '...')
+                set_buttons()
         else:
             if script_exists(script_name):
                 container = get_script_container(script_name)
@@ -102,9 +102,9 @@ class BotInstance:
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
-                    start(self.id, script_name, adb_port, window_name, self.frame)
-                    set_buttons()
-                    return
+                    if start(self.id, script_name, adb_port, window_name, self.frame):
+                        set_buttons()
+                        return
             else:
                 need_to_wait = True
 
@@ -114,8 +114,8 @@ class BotInstance:
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
                         time.sleep(1)
-                    start(self.id, script_name, adb_port, window_name, self.frame)
-                    set_buttons()
+                    if start(self.id, script_name, adb_port, window_name, self.frame):
+                        set_buttons()
 
                 thread = threading.Thread(target=wait_and_start)
                 thread.start()
