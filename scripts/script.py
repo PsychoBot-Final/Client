@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from threading import Thread, Event
 from error_handler import ADBError
 from constants import TEMPLATES_DIR_PATH
-from main_gui import BotInstance
 
 
 class ScriptContainer:
@@ -42,7 +41,7 @@ class BaseScript(ABC):
         adb_device: Device,
         script_name: str,
         window_name: str,
-        parent: BotInstance,
+        parent,
         templates_path: str=None,
         model_path: str=None,
     ) -> None:
