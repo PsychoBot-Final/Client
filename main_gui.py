@@ -7,7 +7,7 @@ import tkinter as tk
 import customtkinter as ctk
 from tkinter import *
 from tkinter import messagebox, ttk
-from news import News
+# from news import News
 from tkinter.font import Font
 from user import get_instances, get_connection_status, set_connection_status
 from emulators.bluestacks import (
