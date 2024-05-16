@@ -3,6 +3,14 @@ user_authenticated = None
 instances = None
 expiry_date = None
 connected = False
+username = None
+
+def set_username(username_: str) -> None:
+    global username
+    username = username_
+
+def get_username() -> str:
+    return username
 
 def set_connection_status(flag: bool) -> None:
     global connected

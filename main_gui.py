@@ -2,12 +2,12 @@ import sys
 import time
 import requests
 import threading
+import logger_configs
 from threading import Event
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import *
 from tkinter import messagebox, ttk
-# from news import News
 from tkinter.font import Font
 from user import get_instances, get_connection_status, set_connection_status
 from emulators.bluestacks import (
@@ -32,6 +32,8 @@ from scripts.script_handler import (
 from emulators.adb_handler import close_adb_connection
 from client.client import send_message
 
+
+logger = logger_configs.get_bot_logger(__name__)
 ctk.set_appearance_mode('dark')
 
 class BotInstance:
@@ -69,6 +71,7 @@ class BotInstance:
         self.frame.after(1000, self.update_instance_names)
 
     def disable(self) -> None:
+        logger.info(f'Disabling all widgets for bot instance: {self.id}')
         for widget in self.frame.winfo_children():
             try:
                 widget.configure(state="disabled")
@@ -90,7 +93,7 @@ class BotInstance:
 
         if RUN_LOCAL:
             if start(self.id, script_name, adb_port, window_name, self):
-                print('Starting local script:', script_name, '...')
+                logger.info(f'Starting local script: {script_name}')
                 set_buttons()
         else:
             if script_exists(script_name):
@@ -98,11 +101,13 @@ class BotInstance:
                 client_version = container.version
                 server_version = get_script_version(script_name)
                 if client_version < server_version:
+                    logger.info(f'Script: {script_name} is outdated, removing models, temaplates, and attempting to update/start.')
                     remove_temp_model(script_name)
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
                     if start(self.id, script_name, adb_port, window_name, self.frame):
+                        logger.info(f'Starting remote script: {script_name}')
                         set_buttons()
                         return
             else:
@@ -115,6 +120,7 @@ class BotInstance:
                     while not script_exists(script_name):
                         time.sleep(1)
                     if start(self.id, script_name, adb_port, window_name, self.frame):
+                        logger.info(f'Update complete for script: {script_name}, script started.')
                         set_buttons()
 
                 thread = threading.Thread(target=wait_and_start)
@@ -175,12 +181,12 @@ class MainGUI:
                 raise requests.exceptions.RequestException
         except requests.exceptions.RequestException:
             self.failed_connection_attemps += 1
-            print('Internet connection lost, attemping to reconnect...')
+            logger.warning('Internet connection lost, attemping to reconnect.')
             if self.failed_connection_attemps > 2:
                 set_connection_status(False)
         finally:
             if not get_connection_status():
-                print('Connection has been lost, disabling bot...')
+                logger.warning('Connection has been lost, disabling bot.')
                 stop_all_scripts()
                 remove_all_temp_models()
                 messagebox.showerror(title='Connection Error', message='Please check your internet connection, restart the bot to continue!')

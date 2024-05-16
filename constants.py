@@ -14,10 +14,14 @@ VALID, INVALID, EXPIRED = range(3)
 FILE_PATH = r'C:\ProgramData\BlueStacks_nxt\bluestacks.conf'
 DISPLAY_NAME_PATTERN = r'bst\.instance\.(.+?_\d+)\.display_name="(.+?)"'
 ADB_PORT_PATTERN = r'bst\.instance\.(.+?_\d+)\.status\.adb_port="(.+?)"'
+
 ACCESS_DENIED = os.environ.get('ACCESS_DENIED')
 HOME_DIR = os.path.expanduser('~')
 BOT_DIR_PATH = os.path.join(HOME_DIR, '.psychobot')
 TEMPLATES_DIR_PATH = os.path.join(BOT_DIR_PATH, 'templates')
+
+BOT_LOGS_DIR = os.path.join(BOT_DIR_PATH, 'logs')
+SCRIPT_LOGS_DIR = os.path.join(BOT_LOGS_DIR, 'script_logs')
 
 VALID_TEMPLATE_EXTENSIONS = ['.jpg', '.png', '.bmp']
 API_PACKAGE_NAME = 'api'

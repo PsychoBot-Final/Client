@@ -219,3 +219,35 @@ BOT_OUTDATED = '''
         <h3>This version of the bot is outdated, please visit discord to download the new version!</h3>
     </body
 '''
+ERROR = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Discord-like Page</title>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: #36393f; /* Discord-like background color */
+                color: #fff; /* Text color */
+                font-family: Arial, sans-serif;
+            }
+            
+            h3 {
+                font-size: 18px;
+                margin-bottom: 20px;
+                text-align: center; /* Ensures text is centered */
+                width: 100%; /* Ensures h1 takes full width */
+                margin-left: 20px; /* Adds margin to the left */
+                margin-right: 20px; /* Adds margin to the right */
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Failed to retrieve user data, please restart...</h3>
+    </body
+'''

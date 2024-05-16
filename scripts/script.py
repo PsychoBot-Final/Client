@@ -4,10 +4,11 @@ import cv2 as cv
 from win_cap import WinCap
 import customtkinter as ctk
 from uiautomator2 import Device
+from error_handler import ADBError
 from abc import ABC, abstractmethod
 from threading import Thread, Event
-from error_handler import ADBError
 from constants import TEMPLATES_DIR_PATH
+import logger_configs
 
 
 class ScriptContainer:
@@ -22,8 +23,7 @@ class ScriptContainer:
 class ScriptThread:
     def __init__(self, func) -> None:
         self.stop_event = Event()
-        self.script_thread = Thread(target=func)
-        self.script_thread.daemon = True
+        self.script_thread = Thread(target=func, daemon=True)
 
     def start(self) -> None:
         self.script_thread.start()
@@ -62,6 +62,7 @@ class BaseScript(ABC):
         self.main_thread = ScriptThread(self.run)
         self.script_threads.append(self.main_thread)
         self.app.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.logger = logger_configs.get_script_logger(script_name)
 
     @abstractmethod
     def create_gui(self, parent: ctk.CTkFrame) -> None:
@@ -81,6 +82,7 @@ class BaseScript(ABC):
 
     def pause_script(self) -> None:
         self.is_paused = not self.is_paused
+        self.logger.info(f'Attempting to pause/unpause script for script: {self.script_name} - Paused: {self.is_paused}')
 
     def is_script_paused(self) -> bool:
         return self.is_paused
@@ -91,6 +93,7 @@ class BaseScript(ABC):
         return script_thread
 
     def kill_script_threads(self) -> None:
+        self.logger.info(f'Attempting to kill script threads for script: {self.script_name}')
         for thread in self.script_threads:
             thread.stop()
 
@@ -110,6 +113,7 @@ class BaseScript(ABC):
 
     def send_adb_input(self, cmd: str) -> None:
         if not self.adb_device:
+            self.logger.warning('ADB device is not registered.')
             raise ADBError('Device not registered...', code=5)
         self.adb_device.shell(cmd)
 
@@ -139,15 +143,17 @@ class BaseScript(ABC):
 
     def load_model(self, model_path=None, multi_label=False) -> None:
         path_to_use = model_path if model_path is not None else self.model_path
+        self.logger.info(f'Loading model from: {path_to_use}')
         self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_to_use, force_reload=True)
         try:
             self.model.cuda()
         except Exception as _:
-            ...
+            self.logger.info(f'Cannot load CUDA for model: {path_to_use}')
         self.model.multi_label = multi_label
     
     def load_templates(self, dir_name: str=None) -> None:
         path_to_use = f'{TEMPLATES_DIR_PATH}/{dir_name}' if dir_name is not None else self.templates_path
+        self.logger.info(f'Loading templates from: {path_to_use}')
         for t in os.listdir(path_to_use):
             name, extension = os.path.splitext(t)
             if extension.lower() in ['.png', '.jpg', '.bmp']:

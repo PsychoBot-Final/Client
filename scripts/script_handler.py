@@ -5,10 +5,12 @@ import types
 import tempfile
 import requests
 import importlib
+import logger_configs
 from base64 import b64decode
 from tkinter import messagebox
 from error_handler import ADBError
 from util import get_resource_path
+from uiautomator2 import Device
 import customtkinter as ctk
 from settings import RUN_LOCAL, WEB_SERVER_URL
 from emulators.adb_handler import connect_to_window
@@ -20,15 +22,21 @@ script_instances = {}
 script_containers = {}
 available_scripts = []
 script_modules = {}
+logger = logger_configs.get_bot_logger(__name__)
 
 def start(id: int, name: str, adb_port: int, window_name: str, parent) -> None:
     adb_device = None
     try:
         adb_device = connect_to_window(window_name, adb_port)
+        logger.info(f'Connected to ADB: {window_name} on port: {adb_port}.')
     except ADBError as e:
+        logger.error(f'Error connecting to ADB: {window_name} on port: {adb_port}.')
         messagebox.showerror('Connection Error', e)
         return False
-    if RUN_LOCAL:
+    return (start_local_script if RUN_LOCAL else start_remote_script)(id, name, adb_device, window_name, parent)
+
+def start_local_script(id: int, name: str, adb_device: Device, window_name: str, parent) -> bool:
+    try:
         with open(get_resource_path('scripts/local/scripts.json'), 'r') as f:
             scripts = json.load(f)
             module_name = scripts[name]['module']   
@@ -46,7 +54,12 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent) -> None:
                 script_instances[id] = script_instance
                 script_modules[id] = module_name
                 return True
-    else:
+    except Exception as e:
+        logger.error('Failed to start local script:', e)
+        return False
+
+def start_remote_script(id: int, name: str, adb_device: Device, window_name: str, parent) -> bool:
+    try:
         if name in script_containers:
             container: ScriptContainer = script_containers[name]
             file_name = container.file_name
@@ -61,7 +74,10 @@ def start(id: int, name: str, adb_port: int, window_name: str, parent) -> None:
             script_instance: BaseScript = script_class(id, adb_device, name, window_name, parent, templates_path, model_path)
             script_instances[id] = script_instance
             return True
-        
+    except Exception as e:
+        logger.error('Failed to start remote script:', e)
+        return False
+
 def stop(id: int) -> None:
     if id in script_instances:
         try:
@@ -97,6 +113,7 @@ def stop_all_scripts() -> None:
             ...
 
 def remove_all_temp_models() -> None:
+    logger.info('Removing all temp models.')
     for _, container in script_containers.items():
         os.unlink(container.model_path)
 
@@ -139,6 +156,7 @@ def receive_script(data) -> None:
         model_path=create_temp_model(model_data),
         templates_path=unzip_templates(file_name, templates_data)
     )
+    logger.info(f'Downloaded script: {script_name}.')
 
 def script_exists(name: str) -> bool:
     return name in script_containers

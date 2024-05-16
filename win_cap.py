@@ -3,6 +3,7 @@ import win32con
 import win32gui
 import win32ui
 import threading
+import logger_configs
 
 
 class WinCap:
@@ -22,9 +23,13 @@ class WinCap:
     w, h = 0, 0
 
     def __init__(self, window_name=None) -> None:
+        self.window_name = window_name
+        self.logger = logger_configs.get_bot_logger(__name__)
         # Check if window_name exists, if not raise Exception.
+        self.logger.info(f'Attempting to capture window: {window_name}')
         self.hwnd = win32gui.FindWindow(None, window_name)
         if not self.hwnd:
+            self.logger.warning(f'Window name does not exist: {window_name}')
             raise Exception(f'Window not found: {window_name}')
         window_rect = win32gui.GetWindowRect(self.hwnd)
         self.w = window_rect[2] - window_rect[0]
@@ -55,6 +60,8 @@ class WinCap:
             win32gui.DeleteObject(dataBitMap.GetHandle())
             img = img[...,:3]
             return np.ascontiguousarray(img)
+        except Exception as e:
+            self.logger.critical(f'Error capturing window: {self.window_name} - Exception: {e}')
         finally:
             self.lock.release()
 
@@ -65,8 +72,5 @@ def list_window_names():
         if win32gui.IsWindowVisible(hwnd):
             name = str(win32gui.GetWindowText(hwnd))
             all_windows.append(name)
-            # if name.startswith('OSRS #'):
-            #     all_windows.append(win32gui.GetWindowText(hwnd))
-            # print(hex(hwnd), win32gui.GetWindowText(hwnd))
     win32gui.EnumWindows(winEnumHandler, None)
     return all_windows
