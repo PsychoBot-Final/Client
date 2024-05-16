@@ -92,6 +92,7 @@ class DiscordWindow(QMainWindow):
             pass
 
     def processUserDetails(self, raw_data):
+        
         try:
             user_data: dict = json.loads(raw_data)
         except json.JSONDecodeError as e:
