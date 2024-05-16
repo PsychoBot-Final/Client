@@ -27,7 +27,8 @@ from PyQt5.QtWidgets import (
 from client.client import (
     connect_to_server, 
     request_script, 
-    request_api
+    request_api,
+    request_api_templates
 )
 from user import (
     set_user_id, 
@@ -131,6 +132,7 @@ class DiscordWindow(QMainWindow):
                 time.sleep(1)
             if get_authenticated():
                 request_script('names', {})
+                request_api_templates()
                 request_api()
                 logger.info(msg=f'User {username} (ID: {user_id}) successfully authenticated with the server.')
                 time_str = f'{days} day(s), {hours} hour(s)' if days > 0 or hours > 0 else f'{minutes} minute(s)'

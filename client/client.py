@@ -1,7 +1,7 @@
 import socketio
 import logger_configs
 from user import get_id
-from api_loader import receive_api
+from api_loader import receive_api, receive_api_templates
 from settings import WEB_SERVER_URL, PORT
 from user import set_user_authenticated, set_connection_status
 from scripts.script_handler import recieve_script_names, receive_script
@@ -14,11 +14,16 @@ def connect_to_server() -> None:
     con.on('script_names', handler=recieve_script_names)
     con.on('full_script', handler=receive_script)
     con.on('api_files', handler=receive_api)
+    con.on('api_templates', handler=receive_api_templates)
     logger.info('Connecting to server.')
     con.connect(f'https://{WEB_SERVER_URL}/?user_id={get_id()}')
 
 def verify_integrity() -> None:
     ...
+
+def request_api_templates() -> None:
+    print('Requesting API templates...')
+    send_message('request_api_templates', {})
 
 def request_script(type: str, name: str) -> None:
     send_message('request_script', {'type': type, 'name': name})

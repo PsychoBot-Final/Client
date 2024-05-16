@@ -4,6 +4,7 @@ import importlib.util
 from base64 import b64decode
 from types import ModuleType
 from constants import API_PACKAGE_NAME
+from scripts.templates.templates import unzip_templates
 
 
 logger = logger_configs.get_bot_logger(__name__)
@@ -30,4 +31,10 @@ def receive_api(data: any) -> None:
             exec(code, module.__dict__)
             package.modules[module_name] = module
             sys.modules[full_module_name] = module
+
+def receive_api_templates(data: any) -> None:
+    # logger.info(f'API Templates: {data}')
+    for filename, content in dict(data).items():
+        content = b64decode(content)
+        unzip_templates(filename, content)
         
