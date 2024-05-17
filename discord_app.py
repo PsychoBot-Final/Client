@@ -28,7 +28,9 @@ from client.client import (
     connect_to_server, 
     request_script, 
     request_api,
-    request_api_templates
+    request_api_templates,
+    is_connected,
+    disconnect_from_server
 )
 from user import (
     set_user_id, 
@@ -142,9 +144,11 @@ class DiscordWindow(QMainWindow):
             else:
                 logger.warning(msg=f'User {username} (ID: {user_id}) already connected to server.')
                 QMessageBox.warning(self, 'Dupliate ID!', 'It seems you are already connected!')
+                if is_connected():
+                    disconnect_from_server()
                 self.close()
                 self.destroy()
-                sys.exit(0)
+                os._exit(1)
         else:
             logger.info(msg=f'User {username} (ID: {user_id}) failed to authenticated, status: {status}.')
             self.webview.setHtml(INVALID_USER if status == 1 else EXPIRED_USER)

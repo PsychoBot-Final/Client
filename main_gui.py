@@ -27,7 +27,8 @@ from scripts.script_handler import (
     get_script_version,
     remove_script_container,
     remove_all_temp_models,
-    stop_all_scripts
+    stop_all_scripts,
+    show_paint
 )
 from emulators.adb_handler import close_adb_connection
 from client.client import send_message
@@ -143,6 +144,7 @@ class BotInstance:
 
     def view_more(self) -> None:
         print(f'View # {self.id}')
+        show_paint(self.id)
 
     def update_instance_names(self) -> None:
         current_instances = list(self.window_select._values)

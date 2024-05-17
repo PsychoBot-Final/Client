@@ -53,6 +53,14 @@ def disconnect() -> None:
     set_connection_status(False)
     logger.warning('Disconnected from server.')
 
+def is_connected() -> bool:
+    return con.connected
+
+def disconnect_from_server() -> None:
+    con.handlers.clear()
+    con.disconnect()
+    set_connection_status(False)
+
 def send_message(event: str, data: any) -> None:
     try:
         con.emit(event, data)

@@ -1,6 +1,7 @@
 import os
 import torch
 import cv2 as cv
+import logger_configs
 from win_cap import WinCap
 import customtkinter as ctk
 from uiautomator2 import Device
@@ -8,7 +9,6 @@ from error_handler import ADBError
 from abc import ABC, abstractmethod
 from threading import Thread, Event
 from constants import TEMPLATES_DIR_PATH
-import logger_configs
 
 
 class ScriptContainer:
@@ -62,6 +62,17 @@ class BaseScript(ABC):
         self.main_thread = ScriptThread(self.run)
         self.script_threads.append(self.main_thread)
         self.app.protocol("WM_DELETE_WINDOW", self.on_close)
+        #
+        self.paint_frame = ctk.CTkToplevel(self.parent.frame)
+        self.paint_frame.title(f'{self.script_name} - {self.window_name}')
+        self.canvas = ctk.CTkCanvas(self.paint_frame, height=300, bg='black')
+        self.canvas.pack(padx=10, pady=10)
+        self.paint_visible = False
+        self.paint_frame.withdraw()
+        self.paint_frame.after(1000, self.redraw)
+        self.paint_frame.protocol("WM_DELETE_WINDOW", self.on_close_paint)
+        #
+        #
         self.logger = logger_configs.get_script_logger(script_name)
 
     @abstractmethod
@@ -77,8 +88,18 @@ class BaseScript(ABC):
         ...
 
     @abstractmethod
+    def paint(self) -> None:
+        ...
+
+    @abstractmethod
     def stop(self) -> None:
         ...
+
+    def redraw(self) -> None:
+        if self.paint_visible:
+            self.canvas.delete('all')
+            self.paint()
+        self.paint_frame.after(1000, self.redraw)
 
     def pause_script(self) -> None:
         self.is_paused = not self.is_paused
@@ -104,12 +125,24 @@ class BaseScript(ABC):
         y = (screen_height // 2) - (height // 2)
         self.app.geometry(f"{width}x{height}+{x}+{y}")
 
+    def show_paint(self) -> None:
+        self.paint_visible = not self.paint_visible
+        self.paint_frame.deiconify() if self.paint_visible else self.paint_frame.withdraw()
+
+    def on_close_paint(self) -> None:
+        self.paint_visible = False
+        self.paint_frame.destroy()
+
     def on_close(self) -> None:
         self.parent.stop_script()
         self.close_gui()
 
     def close_gui(self) -> None:
         self.app.destroy()
+    
+    def close_paint(self) -> None:
+        self.paint_visible = False
+        self.paint_frame.destroy()
 
     def send_adb_input(self, cmd: str) -> None:
         if not self.adb_device:

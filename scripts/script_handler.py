@@ -83,6 +83,7 @@ def stop(id: int) -> None:
         try:
             instance: BaseScript = script_instances[id]
             instance.close_gui()
+            instance.close_paint()
             instance.stop()
             if id in script_modules:
                 module_name = script_modules[id]
@@ -108,9 +109,15 @@ def stop_all_scripts() -> None:
         try:
             instance: BaseScript = script_instances[id]
             instance.close_gui()
+            instance.close_paint()
             instance.stop()
         except RuntimeError as _:
             ...
+
+def show_paint(id: int) -> None:
+    if id in script_instances:
+        instance: BaseScript = script_instances[id]
+        instance.show_paint()
 
 def remove_all_temp_models() -> None:
     logger.info('Removing all temp models.')
