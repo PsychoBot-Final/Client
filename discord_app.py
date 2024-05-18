@@ -11,8 +11,14 @@ from datetime import datetime
 from PyQt5.QtCore import QUrl
 from settings import WEB_SERVER_URL
 from PyQt5.QtWidgets import QMessageBox
-from constants import BOT_VERSION, ACCESS_DENIED
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+from constants import (
+    BOT_VERSION, 
+    ACCESS_DENIED,
+    VALID,
+    INVALID,
+    EXPIRED
+)
 from error_pages import (
     RETRY, 
     INVALID_USER, 
@@ -33,6 +39,7 @@ from client.client import (
     disconnect_from_server
 )
 from user import (
+    get_status,
     set_user_id, 
     set_instances,
     set_expiry_date,
@@ -129,6 +136,13 @@ class DiscordWindow(QMainWindow):
             
             connect_to_server()
             self.setVisible(False)
+
+            # while (status_id:= get_status()) is None:
+            #     time.sleep(1)
+
+            
+
+
 
             while get_authenticated() is None:
                 time.sleep(1)

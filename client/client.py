@@ -3,7 +3,7 @@ import logger_configs
 from user import get_id
 from api_loader import receive_api, receive_api_templates
 from settings import WEB_SERVER_URL, PORT
-from user import set_user_authenticated, set_connection_status
+from user import set_user_authenticated, set_connection_status, set_status
 from scripts.script_handler import recieve_script_names, receive_script
 
 
@@ -30,6 +30,10 @@ def request_script(type: str, name: str) -> None:
 
 def request_api() -> None:
     send_message('request_api', {})
+
+@con.event
+def user_status(status_id: int) -> None:
+    set_status(status_id)
 
 @con.event
 def authenticated(flag: bool) -> None:
