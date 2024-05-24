@@ -145,14 +145,26 @@ class DiscordWindow(QMainWindow):
                 time.sleep(1)
 
             if status_id == INVALID:
-                ...
+                logger.warning(msg=f'User {username} (ID: {user_id}) is not a valid member.')
+                QMessageBox.warning(self, 'Membership Invalid', 'You are not an active member of Psychobot, please visit the official discord to purchase membership.')
+                if is_connected():
+                    disconnect_from_server()
+                self.close()
+                self.destroy()
+                os._exit(1)
 
             elif status_id == EXPIRED:
-                ...
+                logger.warning(msg=f'User {username} (ID: {user_id}) membership has expired.')
+                QMessageBox.warning(self, 'Membership Expired', 'Your membership has expired, please visit the official discord to renew.')
+                if is_connected():
+                    disconnect_from_server()
+                self.close()
+                self.destroy()
+                os._exit(1)
 
             elif status_id == IN_USE:
                 logger.warning(msg=f'User {username} (ID: {user_id}) already connected to server.')
-                QMessageBox.warning(self, 'Dupliate ID!', 'It seems you are already connected!')
+                QMessageBox.warning(self, 'Already Connected', 'It seems you are already connected!')
                 if is_connected():
                     disconnect_from_server()
                 self.close()
