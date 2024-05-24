@@ -5,13 +5,21 @@ expiry_date = None
 connected = False
 username = None
 
+uuid = None
 status = None
+
+def set_uuid(uuid_: str) -> None:
+    global uuid
+    uuid = uuid_
+
+def get_uuid() -> str:
+    return uuid
 
 def set_status(status_id: int) -> None:
     global status
     status = status_id
 
-def get_status() -> int:
+def get_status_id() -> int:
     return status
 
 def set_username(username_: str) -> None:

@@ -10,7 +10,7 @@ PUBLIC_SERVER_URL = os.environ.get('PUBLIC_SERVER_URL')
 
 LOCAL_HOST = '127.0.0.1'
 OUTDATED = 'outdated'
-VALID, INVALID, EXPIRED = range(3)
+VALID, INVALID, EXPIRED, IN_USE = range(4)
 FILE_PATH = r'C:\ProgramData\BlueStacks_nxt\bluestacks.conf'
 DISPLAY_NAME_PATTERN = r'bst\.instance\.(.+?_\d+)\.display_name="(.+?)"'
 ADB_PORT_PATTERN = r'bst\.instance\.(.+?_\d+)\.status\.adb_port="(.+?)"'

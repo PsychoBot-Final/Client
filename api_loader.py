@@ -18,10 +18,10 @@ else:
 if not hasattr(package, 'modules'):
     package.modules = {}
 
-def receive_api(data: any) -> None:
-    files = data['files']
+def receive_api_files(data: any) -> None:
+    files = data['result']
     if len(files):
-        logger.info('Unpacking API files.')
+        # logger.info('Unpacking API files.')
         for file in files:
             code = b64decode(file['content']).decode('utf-8')
             module_name = str(file['filename']).replace('.py', '')
@@ -32,9 +32,9 @@ def receive_api(data: any) -> None:
             package.modules[module_name] = module
             sys.modules[full_module_name] = module
 
-def receive_api_templates(data: any) -> None:
-    # logger.info(f'API Templates: {data}')
-    for filename, content in dict(data).items():
+def receive_api_templates(data: dict) -> None:
+    files: dict = data.get('result')
+    for filename, content in files.items():
         content = b64decode(content)
         unzip_templates(filename, content)
         

@@ -144,11 +144,12 @@ def remove_script_container(script_name: str) -> None:
     if script_name in script_containers: 
         del script_containers[script_name]
 
-def recieve_script_names(data) -> None:
+def set_script_names(response: dict) -> None:
     global available_scripts
-    available_scripts = data
+    available_scripts = response.get('result')
 
 def receive_script(data) -> None:
+    data = data['result']
     script_name = data['name']
     file_name = data['file_name']
     script_data = str(data['data']).split('|')
