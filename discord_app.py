@@ -168,28 +168,6 @@ class DiscordWindow(QMainWindow):
                 QMessageBox.information(self, "PsychoBot", f"Welcome {username}, you have {time_str} left!")
                 self.close()
                 MainGUI()
-
-
-
-            # while get_authenticated() is None:
-            #     time.sleep(1)
-            # if get_authenticated():
-            #     request_script('names', {})
-            #     request_api_templates()
-            #     request_api()
-            #     logger.info(msg=f'User {username} (ID: {user_id}) successfully authenticated with the server.')
-            #     time_str = f'{days} day(s), {hours} hour(s)' if days > 0 or hours > 0 else f'{minutes} minute(s)'
-            #     QMessageBox.information(self, "PsychoBot", f"Welcome {username}, you have {time_str} left!")
-            #     self.close()
-            #     MainGUI()
-            # else:
-            #     logger.warning(msg=f'User {username} (ID: {user_id}) already connected to server.')
-            #     QMessageBox.warning(self, 'Dupliate ID!', 'It seems you are already connected!')
-            #     if is_connected():
-            #         disconnect_from_server()
-            #     self.close()
-            #     self.destroy()
-            #     os._exit(1)
         else:
             logger.info(msg=f'User {username} (ID: {user_id}) failed to authenticated, status: {status}.')
             self.webview.setHtml(INVALID_USER if status == 1 else EXPIRED_USER)
