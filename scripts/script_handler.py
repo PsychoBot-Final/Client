@@ -144,9 +144,9 @@ def remove_script_container(script_name: str) -> None:
     if script_name in script_containers: 
         del script_containers[script_name]
 
-def set_script_names(response: dict) -> None:
+def set_script_names(data: dict) -> None:
     global available_scripts
-    available_scripts = response.get('result')
+    available_scripts = data
 
 def receive_script(data) -> None:
     data = data['result']

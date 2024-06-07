@@ -59,7 +59,20 @@ def on_user_status(data: dict) -> None:
     set_status(status_id)
 #
 
-def callback_handler(data: dict) -> None:
+def callback_handler(*args) -> None:
+
+    if not len(args):
+        logging.warning('No arguments were received.')
+        return
+
+    data = args[0]
+    
+    try:
+        data = dict(data)
+    except (ValueError, TypeError):
+        logging.warning('Data is invalid type.')
+        return
+
     event = data.get('event', None)
     result = data.get('result', None)
     
@@ -85,7 +98,7 @@ def callback_handler(data: dict) -> None:
 
     elif event == 'api_files':
         receive_api_files(result)
-        
+
     elif event == 'script':
         receive_script(result)
 
