@@ -30,9 +30,11 @@ from PyQt5.QtWidgets import (
     QDesktopWidget
 )
 from conn.client import (
-    request_api_files,
-    request_script_names,
-    request_api_templates,
+    request,
+
+    # request_api_files,
+    # request_script_names,
+    # request_api_templates,
     connect_to_server,
     is_connected,
     disconnect_from_server
@@ -172,9 +174,13 @@ class DiscordWindow(QMainWindow):
                 os._exit(1)
 
             elif status_id == VALID:
-                request_script_names()
-                request_api_templates()
-                request_api_files()
+                request(event_name='script_names')
+                request(event_name='api_templates')
+                request(event_name='api_files')
+
+                # request_script_names()
+                # request_api_templates()
+                # request_api_files()
                 logger.info(msg=f'User {username} (ID: {user_id}) successfully authenticated with the server.')
                 time_str = f'{days} day(s), {hours} hour(s)' if days > 0 or hours > 0 else f'{minutes} minute(s)'
                 QMessageBox.information(self, "PsychoBot", f"Welcome {username}, you have {time_str} left!")

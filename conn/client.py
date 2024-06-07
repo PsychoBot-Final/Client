@@ -59,22 +59,61 @@ def on_user_status(data: dict) -> None:
     set_status(status_id)
 #
 
+def callback_handler(data: dict) -> None:
+    event = data.get('event', None)
+    result = data.get('result', None)
+    
+    if not event:
+        logging.warning('Missing event name.')
+        return
+    
+    if not result:
+        logging.warning(f'Event {event} missing response data.')
+        return
+    
+    if 'Error' in result:
+        logging.warning(f'Event {event}, error in response.')
+        return
 
-def request_script_names() -> None:
+    logging.info(f'Received event {event} with valid data.')
+
+    if event == 'script_names':
+        set_script_names(result)
+
+    elif event == 'api_templates':
+        receive_api_templates(result)
+
+    elif event == 'api_files':
+        receive_api_files(result)
+        
+    elif event == 'script':
+        receive_script(result)
+
+
+def request(event_name: str, **kwargs) -> None:
     data = {'uuid': get_uuid()}
-    send_message(event='request_script_names', data=data, callback=set_script_names)
 
-def request_api_templates() -> None:
-    data = {'uuid': get_uuid()}
-    send_message(event='request_api_templates', data=data, callback=receive_api_templates)
+    for key, val in kwargs.items():
+        data[key] = val
 
-def request_api_files() -> None:
-    data = {'uuid': get_uuid()}
-    send_message(event='request_api_files', data=data, callback=receive_api_files)
+    send_message(event=f'request_{event_name}', data=data, callback=callback_handler)
 
-def request_script(script_name: str) -> None:
-    data = {'uuid': get_uuid(), 'script_name': script_name}
-    send_message(event='request_script', data=data, callback=receive_script)
+
+# def request_script_names() -> None:
+#     data = {'uuid': get_uuid()}
+#     send_message(event='request_script_names', data=data, callback=set_script_names)
+
+# def request_api_templates() -> None:
+#     data = {'uuid': get_uuid()}
+#     send_message(event='request_api_templates', data=data, callback=receive_api_templates)
+
+# def request_api_files() -> None:
+#     data = {'uuid': get_uuid()}
+#     send_message(event='request_api_files', data=data, callback=receive_api_files)
+
+# def request_script(script_name: str) -> None:
+#     data = {'uuid': get_uuid(), 'script_name': script_name}
+#     send_message(event='request_script', data=data, callback=receive_script)
 
 #
 

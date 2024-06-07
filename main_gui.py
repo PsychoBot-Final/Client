@@ -31,7 +31,7 @@ from scripts.script_handler import (
     show_paint
 )
 from emulators.adb_handler import close_adb_connection
-from conn.client import send_message
+from conn.client import request
 
 
 logger = logger_configs.get_bot_logger(__name__)
@@ -115,7 +115,10 @@ class BotInstance:
                 need_to_wait = True
 
             if need_to_wait:
-                send_message(event='request_script', data=script_name)
+
+                request(event_name='request_script', script_name=script_name)
+
+                # send_message(event='request_script', data={'script_name': script_name})
                 
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
