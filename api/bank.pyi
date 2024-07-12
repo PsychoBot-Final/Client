@@ -1,3 +1,61 @@
+import numpy as np
+
+
+def is_invalid_bank_pin(screen_shot: np.ndarray) -> bool:
+    """
+    The function `is_invalid_bank_pin` checks if any of the specified templates for invalid bank PIN are
+    found in a given screenshot.
+    
+    Args:
+      screen_shot (np.ndarray): The `screen_shot` parameter is expected to be a NumPy array representing
+    an image of the screen display. This function `is_invalid_bank_pin` takes this image as input and
+    checks if any of the provided templates for invalid bank PINs match with the content of the screen
+    shot. If any of
+    
+    Returns:
+      The function `is_invalid_bank_pin` is returning a boolean value. It checks if any of the templates
+    for invalid bank PINs are found in the given `screen_shot` image using the `find_rectangles`
+    function with a threshold of 0.7. If any of the templates are found, it returns `True`, indicating
+    that an invalid bank PIN is detected. Otherwise, it returns `
+    """
+    ...
+
+def solve_bank_pin(script, bank_pin: str, screen_shot: np.ndarray) -> None:
+    """
+    The function `solve_bank_pin` takes a script, bank PIN, and screen shot as input, interacts with the
+    screen to enter the bank PIN, and verifies the PIN if all stages are completed.
+    
+    Args:
+      script: The `script` parameter seems to be an object or instance of a class that has methods for
+    interacting with a banking application or system. It likely contains functions for clicking on
+    points on the screen, verifying bank PIN, and other related actions.
+      bank_pin (str): The `bank_pin` parameter is a string representing the user's bank PIN.
+      screen_shot (np.ndarray): A screenshot of the screen where the bank PIN input is displayed. This
+    is used to determine the stage of the bank PIN input process and locate the specific digit to click
+    on.
+    
+    Returns:
+      The function `solve_bank_pin` returns `None` if the `bank_pin_stage` is `None` or if the
+    `click_point` is `None`.
+    """
+    ...
+
+def pin_menu_open(screen_shot: np.ndarray) -> bool:
+    """
+    The function `pin_menu_open` determines if a pin menu is open on a screen shot by finding rectangles
+    matching a template with a certain threshold.
+    
+    Args:
+      screen_shot (np.ndarray): The `screen_shot` parameter is a numpy array representing a screenshot
+    of the current screen or window in the application or game you are working with.
+    
+    Returns:
+      The function `pin_menu_open` is returning a boolean value. It is returning `True` if there are
+    rectangles found in the `screen_shot` that match the template for a pin menu with a confidence score
+    of at least 0.7, and `False` otherwise.
+    """
+    ...
+
 def get_pin_number_bounds(screen_shot, pin_number: str) -> tuple:
   """
   The function `get_pin_number_bounds` finds the center point of a specified PIN number template

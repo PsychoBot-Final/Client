@@ -1,6 +1,10 @@
 import os
 import torch
 import cv2 as cv
+import random
+import numpy as np
+from time import sleep
+# from api.bank import get_pin_stage, get_pin_number_bounds
 import logger_configs
 from win_cap import WinCap
 import customtkinter as ctk
@@ -43,6 +47,7 @@ class BaseScript(ABC):
         script_name: str,
         window_name: str,
         parent,
+        bank_pin: str=None,
         templates_path: str=None,
         model_path: str=None,
     ) -> None:
@@ -51,7 +56,10 @@ class BaseScript(ABC):
         self.script_name = script_name
         self.window_name = window_name
         self.parent = parent
+        self.bank_pin = bank_pin
+        self.verify_bank_pin = None
         self.app = ctk.CTkToplevel(self.parent.frame)
+        self.app.attributes("-topmost", True)
         self.templates = {}
         self.model = None
         self.win_cap = WinCap(self.window_name)
@@ -174,15 +182,21 @@ class BaseScript(ABC):
         }
         self.send_adb_input(f'input keyevent {types[type]}')
 
-    def load_model(self, model_path=None, multi_label=False) -> None:
-        path_to_use = model_path if model_path is not None else self.model_path
-        self.logger.info(f'Loading model from: {path_to_use}')
-        self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_to_use, force_reload=True)
-        try:
-            self.model.cuda()
-        except Exception as _:
-            self.logger.info(f'Cannot load CUDA for model: {path_to_use}')
-        self.model.multi_label = multi_label
+    def load_model(self, model_path=None, multi_label=False, callback: callable=None) -> None:
+        def load_model_task() -> None:
+            path_to_use = model_path if model_path is not None else self.model_path
+            self.logger.info(f'Loading model from: {path_to_use}')
+            self.model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_to_use, force_reload=True)
+            try:
+                self.model.cuda()
+            except Exception as _:
+                self.logger.info(f'Cannot load CUDA for model: {path_to_use}')
+            self.model.multi_label = multi_label
+
+            if callback:
+                callback()
+            
+        Thread(target=load_model_task).start()
     
     def load_templates(self, dir_name: str=None) -> None:
         path_to_use = f'{TEMPLATES_DIR_PATH}/{dir_name}' if dir_name is not None else self.templates_path

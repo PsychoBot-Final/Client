@@ -9,7 +9,11 @@ import customtkinter as ctk
 from tkinter import *
 from tkinter import messagebox, ttk
 from tkinter.font import Font
-from user import get_instances, get_connection_status, set_connection_status
+from user import (
+    get_instances, 
+    get_connection_status, 
+    set_connection_status
+)
 from emulators.bluestacks import (
     get_bluestacks_windows, 
     get_adb_port_for_window
@@ -38,30 +42,104 @@ logger = logger_configs.get_bot_logger(__name__)
 ctk.set_appearance_mode('dark')
 
 class BotInstance:
+
     def __init__(self, id: int, parent_frame: ctk.CTkFrame) -> None:
         self.id = id
         self.frame = ctk.CTkFrame(parent_frame)
 
-        self.window_select = ctk.CTkOptionMenu(self.frame, values=list(get_bluestacks_windows().keys()))
+        # Fiery theme colors
+        bg_color = '#FF7F50'  # Coral
+        fg_color = '#FFD700'  # Gold
+        text_color = 'black'
+        button_fg_color = '#FFA500'  # Orange
+        button_hover_color = '#FF8C00'  # DarkOrange
+        entry_bg_color = '#FFA500'  # Orange
+        entry_text_color = 'black'
+        dropdown_bg_color = '#FF7F50'  # Coral
+        dropdown_text_color = 'black'
+
+        self.window_select = ctk.CTkOptionMenu(
+            self.frame, 
+            values=list(get_bluestacks_windows().keys()), 
+            fg_color=dropdown_bg_color, 
+            text_color=dropdown_text_color, 
+            dropdown_fg_color=fg_color, 
+            dropdown_text_color=dropdown_text_color
+        )
         self.window_select.pack(side='left', padx=(10, 0), pady=10)
         
-        self.script_select = ctk.CTkOptionMenu(self.frame, values=get_available_scripts())
+        self.script_select = ctk.CTkOptionMenu(
+            self.frame, 
+            values=get_available_scripts(), 
+            fg_color=dropdown_bg_color, 
+            text_color=dropdown_text_color, 
+            dropdown_fg_color=fg_color, 
+            dropdown_text_color=dropdown_text_color
+        )
         self.script_select.pack(side='left', padx=(10, 0), pady=10)
 
-        self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
-        self.start_button.configure(fg_color='green', text_color='black', hover_color='#02640f', border_color='black', border_width=1)
+        self.pin_field = ctk.CTkEntry(
+            self.frame, 
+            placeholder_text='PIN...', 
+            width=70, 
+            show="*", 
+            fg_color=entry_bg_color, 
+            text_color='black',
+            placeholder_text_color='black'
+        )
+        self.pin_field.pack(side='left', padx=(10, 0), pady=10)
+
+        self.start_button = ctk.CTkButton(
+            self.frame, 
+            width=70, 
+            text='Start', 
+            command=self.start_script, 
+            fg_color=button_fg_color, 
+            text_color=text_color, 
+            hover_color=button_hover_color, 
+            border_color='black', 
+            border_width=1
+        )
         self.start_button.pack(side='left', padx=(10, 0), pady=10)
 
-        self.pause_button = ctk.CTkButton(self.frame, width=70, text='Pause', command=self.pause_script)
-        self.pause_button.configure(fg_color='#ffff00', text_color='black', hover_color='#ffea00', border_color='black', border_width=1)
+        self.pause_button = ctk.CTkButton(
+            self.frame, 
+            width=70, 
+            text='Pause', 
+            command=self.pause_script, 
+            fg_color='#FFD700',  # Gold
+            text_color=text_color, 
+            hover_color='#FFC107',  # Amber
+            border_color='black', 
+            border_width=1
+        )
         self.pause_button.pack(side='left', padx=(10, 0), pady=10)
 
-        self.stop_button = ctk.CTkButton(self.frame, width=70, text='Stop', command=self.stop_script)
-        self.stop_button.configure(fg_color='red', text_color='black', hover_color='#cd0000', border_color='black', border_width=1)
+        self.stop_button = ctk.CTkButton(
+            self.frame, 
+            width=70, 
+            text='Stop', 
+            command=self.stop_script, 
+            fg_color='#FF4500',  # OrangeRed
+            text_color=text_color, 
+            hover_color='#FF6347',  # Tomato
+            border_color='black', 
+            border_width=1
+        )
         self.stop_button.pack(side='left', padx=(10, 0), pady=10)
 
-        view_screen = ctk.CTkButton(self.frame, width=60, height=60, text='VIEW', command=self.view_more)
-        view_screen.pack(side='right', padx=(0, 10), pady=10)
+        self.view_screen = ctk.CTkButton(
+            self.frame, 
+            width=200, 
+            text='View', 
+            command=self.view_more, 
+            fg_color=button_fg_color, 
+            text_color=text_color, 
+            hover_color=button_hover_color, 
+            border_color='black', 
+            border_width=1
+        )
+        self.view_screen.pack(side='right', padx=(10, 10), pady=10)
 
         self.frame.pack(padx=10, pady=10, expand=True, fill='both')
         self.frame.configure(border_color='black', border_width=1)
@@ -70,6 +148,40 @@ class BotInstance:
         self.stop_button.configure(state='disabled')
 
         self.frame.after(1000, self.update_instance_names)
+        # self.id = id
+        # self.frame = ctk.CTkFrame(parent_frame)
+
+        # self.window_select = ctk.CTkOptionMenu(self.frame, values=list(get_bluestacks_windows().keys()), fg_color='#F2CDA3', text_color='black', dropdown_fg_color='white', dropdown_text_color='black')
+        # self.window_select.pack(side='left', padx=(10, 0), pady=10)
+        
+        # self.script_select = ctk.CTkOptionMenu(self.frame, values=get_available_scripts(), fg_color='#F2CDA3', text_color='black')
+        # self.script_select.pack(side='left', padx=(10, 0), pady=10)
+
+        # self.pin_field = ctk.CTkEntry(self.frame, placeholder_text='Bank PIN...', width=70, show="*")
+        # self.pin_field.pack(side='left', padx=(10,0), pady=10)
+
+        # self.start_button = ctk.CTkButton(self.frame, width=70, text='Start', command=self.start_script)
+        # self.start_button.configure(fg_color='green', text_color='black', hover_color='#02640f', border_color='black', border_width=1)
+        # self.start_button.pack(side='left', padx=(10, 0), pady=10)
+
+        # self.pause_button = ctk.CTkButton(self.frame, width=70, text='Pause', command=self.pause_script)
+        # self.pause_button.configure(fg_color='#ffff00', text_color='black', hover_color='#ffea00', border_color='black', border_width=1)
+        # self.pause_button.pack(side='left', padx=(10, 0), pady=10)
+
+        # self.stop_button = ctk.CTkButton(self.frame, width=70, text='Stop', command=self.stop_script)
+        # self.stop_button.configure(fg_color='red', text_color='black', hover_color='#cd0000', border_color='black', border_width=1)
+        # self.stop_button.pack(side='left', padx=(10, 0), pady=10)
+
+        # view_screen = ctk.CTkButton(self.frame, width=200, text='View', command=self.view_more)
+        # view_screen.pack(side='right', padx=(10, 10), pady=10)
+
+        # self.frame.pack(padx=10, pady=10, expand=True, fill='both')
+        # self.frame.configure(border_color='black', border_width=1)
+
+        # self.pause_button.configure(state='disabled')
+        # self.stop_button.configure(state='disabled')
+
+        # self.frame.after(1000, self.update_instance_names)
 
     def disable(self) -> None:
         logger.info(f'Disabling all widgets for bot instance: {self.id}')
@@ -84,6 +196,7 @@ class BotInstance:
         window_name = self.window_select.get()
         script_name = self.script_select.get()
         adb_port = get_adb_port_for_window(window_name)
+        bank_pin = self.pin_field.get()
 
         def set_buttons() -> None:
             self.start_button.configure(state='disabled')
@@ -93,10 +206,30 @@ class BotInstance:
             self.window_select.configure(state='disabled')
 
         if RUN_LOCAL:
-            if start(self.id, script_name, adb_port, window_name, self):
+            if len(bank_pin) > 4:
+                logger.warning('Bank PIN cannot be longer than 4 digits.')
+                messagebox.showwarning(title='Warning!', message='Bank PIN cannot be longer than 4 digits.')
+                return
+            
+            if not bank_pin.isdigit() and bank_pin != '':
+                logger.warning('Bank PIN must only contain numbers.')
+                messagebox.showwarning(title='Warning!', message='Bank PIN must only contain numbers.')
+                return
+
+            if start(self.id, script_name, adb_port, window_name, self, bank_pin):
                 logger.info(f'Starting local script: {script_name}')
                 set_buttons()
         else:
+            if len(bank_pin) > 4:
+                logger.warning('Bank PIN cannot be longer than 4 digits.')
+                messagebox.showwarning(title='Warning!', message='Bank PIN cannot be longer than 4 digits.')
+                return
+            
+            if not bank_pin.isdigit() and bank_pin != '':
+                logger.warning('Bank PIN must only contain numbers.')
+                messagebox.showwarning(title='Warning!', message='Bank PIN must only contain numbers.')
+                return
+
             if script_exists(script_name):
                 container = get_script_container(script_name)
                 client_version = container.version
@@ -107,7 +240,7 @@ class BotInstance:
                     remove_script_container(script_name)
                     need_to_wait = True
                 else:
-                    if start(self.id, script_name, adb_port, window_name, self.frame):
+                    if start(self.id, script_name, adb_port, window_name, self.frame, bank_pin):
                         logger.info(f'Starting remote script: {script_name}')
                         set_buttons()
                         return
@@ -115,15 +248,12 @@ class BotInstance:
                 need_to_wait = True
 
             if need_to_wait:
-
                 request(event_name='request_script', script_name=script_name)
-
-                # send_message(event='request_script', data={'script_name': script_name})
-                
+    
                 def wait_and_start() -> None:
                     while not script_exists(script_name):
                         time.sleep(1)
-                    if start(self.id, script_name, adb_port, window_name, self.frame):
+                    if start(self.id, script_name, adb_port, window_name, self.frame, bank_pin):
                         logger.info(f'Update complete for script: {script_name}, script started.')
                         set_buttons()
 
@@ -260,15 +390,15 @@ class MainGUI:
         notebook = ttk.Notebook(self.center_frame, style="Rounded.TNotebook")
         notebook.pack(expand=True, fill='both')
         self.home_tab = ctk.CTkFrame(notebook)
-        notebook.add(self.home_tab, text='Home')
-        notebook.select(self.home_tab)
+        # notebook.add(self.home_tab, text='Home')
+        # notebook.select(self.home_tab)
         self.bot_tab = ctk.CTkFrame(notebook)
         notebook.add(self.bot_tab, text='Bots')
         self.bot_tab_frame = ctk.CTkFrame(self.bot_tab)
         self.bot_tab_frame.pack(side='left', fill='both', expand=True, padx=10, pady=10)
         self.bot_tab_frame.configure(border_color='black', border_width=1)
-        self.settings_tab = ctk.CTkFrame(notebook)
-        notebook.add(self.settings_tab, text='Settings')
+        # self.settings_tab = ctk.CTkFrame(notebook)
+        # notebook.add(self.settings_tab, text='Settings')
 
     def create_bot_instances(self) -> None:
         self.instance_frames = {id: BotInstance(id, self.bot_tab_frame) for id in range(self.num_instances)}

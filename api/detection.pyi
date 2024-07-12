@@ -1,3 +1,37 @@
+from numpy import ndarray
+
+
+def detect_and_return_all_labels(self, screen_shot: ndarray, classes: list, model: any, min_confidence_threshold: float=0.5, filter: list=None) -> list:
+    """
+    This function takes a screenshot image, a list of classes, a model, a minimum confidence threshold,
+    and an optional filter list, detects objects in the image using the model, and returns a list of
+    labels and their coordinates based on the specified criteria.
+    
+    Args:
+      screen_shot (ndarray): The `screen_shot` parameter is expected to be a numpy array representing an
+    image in BGR format.
+      classes (list): The `classes` parameter in the `detect_and_return_all_labels` function is a list
+    that contains the class labels for the objects that the model can detect. Each element in the list
+    corresponds to a specific class label that the model has been trained to recognize.
+      model (any): The `model` parameter in the `detect_and_return_all_labels` function is expected to
+    be an object representing a machine learning model that can perform object detection on an image.
+    This model should have a method that can take an image (in the form of a NumPy array) as input and
+    return
+      min_confidence_threshold (float): The `min_confidence_threshold` parameter in the
+    `detect_and_return_all_labels` function is a float value that represents the minimum confidence
+    level required for a detected label to be included in the final list of detections. Labels with
+    confidence levels below this threshold will be filtered out.
+      filter (list): The `filter` parameter in the `detect_and_return_all_labels` function is used to
+    specify a list of labels that you want to filter out from the detections. If the `filter` parameter
+    is provided and a label detected by the model is not in the `filter` list, then that detection
+    
+    Returns:
+      The function `detect_and_return_all_labels` returns a list of tuples, where each tuple contains
+    the label name, bounding box coordinates (x1, x2, y1, y2) for detected objects in the input
+    `screen_shot` image.
+    """
+    ...
+
 def find_rectangles(screen_shot, image, threshold):
     """
     The function `find_rectangles` uses template matching to locate instances of a specified image

@@ -1,9 +1,21 @@
-def test() -> None:
-    """ Test function # 1. """
-    ...
+from typing import Union, List, Tuple
 
-def test32() -> None:
-    """ Test function # 2. """
+def is_point_in_bounds(point: Tuple[int, int], bounds: Union[List[tuple[int, int, int, int]], Tuple[int, int, int, int]]) -> bool:
+    """
+    The function `is_point_in_bounds` checks if a given point is within the specified bounds.
+    
+    Args:
+      point (Tuple[int, int]): The `point` parameter is a tuple containing the x and y coordinates of a
+    point.
+      bounds (Union[List[tuple[int, int, int, int]], Tuple[int, int, int, int]]): The `bounds` parameter
+    in the `is_point_in_bounds` function can be either a list of tuples or a single tuple. Each tuple in
+    the list or the single tuple represents a bounding box in the format (x, y, width, height). The
+    function checks if the given `point`
+    
+    Returns:
+      The function `is_point_in_bounds` returns a boolean value, either `True` if the given point is
+    within the specified bounds, or `False` if it is not.
+    """
     ...
 
 def player_is_moving(screen_shot, min_delay: float) -> bool:
