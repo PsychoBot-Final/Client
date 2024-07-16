@@ -34,5 +34,5 @@ def find_minimap_position_on_map(player_x_on_cropped_region, player_y_on_cropped
     ...
 
 
-def convert_to_grayscale(self, image):
+def convert_to_grayscale( image):
     ...

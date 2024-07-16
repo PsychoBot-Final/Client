@@ -1,7 +1,7 @@
 from numpy import ndarray
 
 
-def detect_and_return_all_labels(self, screen_shot: ndarray, classes: list, model: any, min_confidence_threshold: float=0.5, filter: list=None) -> list:
+def detect_and_return_all_labels(screen_shot: ndarray, classes: list, model: any, min_confidence_threshold: float=0.5, filter: list=None) -> list:
     """
     This function takes a screenshot image, a list of classes, a model, a minimum confidence threshold,
     and an optional filter list, detects objects in the image using the model, and returns a list of
@@ -164,7 +164,7 @@ def draw_rectangles(screen_shot, rectangles):
     """
     ...
 
-def yellow_dot_is_in_minimap_bounds(self, detected_rectangle):
+def yellow_dot_is_in_minimap_bounds(detected_rectangle):
     """
     This function checks if a yellow dot is within the bounds of a specified rectangle in an image using
     OpenCV.
