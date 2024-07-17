@@ -112,3 +112,42 @@ def is_run_activated(screen_shot):
 
 def activate_run(script):
     ...
+def get_hp(screen_shot):
+    """
+    Extracts the player's HP (hit points) from a given screenshot.
+
+    Parameters:
+    screen_shot (numpy.ndarray): The screenshot image from which to extract the player's HP.
+
+    Returns:
+    int or None: The extracted HP value as an integer if found, otherwise None.
+    """
+    ...
+
+def find_and_group_characters(screen_shot, templates, threshold=0.95, max_gap=5):
+    """
+    Finds and groups numeric characters in a given screenshot based on provided templates.
+
+    Parameters:
+    screen_shot (numpy.ndarray): The screenshot image in which to find the characters.
+    templates (dict): A dictionary where keys are characters and values are their respective template images.
+    threshold (float): The matching threshold for template matching. Default is 0.95.
+    max_gap (int): The maximum allowable gap between characters to consider them as part of the same number. Default is 5.
+
+    Returns:
+    str: The concatenated string of detected numeric characters.
+    """
+    ...
+
+def is_player_moving_in_area(script, detected_rectangle, interval=0.1):
+    """
+    Continuously checks if a player is moving within a specified rectangular area.
+
+    Args:
+        detected_rectangle (tuple): A tuple containing the coordinates of the rectangle to detect player movement.
+        interval (int, optional): Time interval in seconds between movement checks. Default is 1 second.
+
+    Returns:
+        bool: True if the player is moving within the specified area, False otherwise.
+    """
+    ...

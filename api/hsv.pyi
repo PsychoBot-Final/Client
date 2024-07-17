@@ -1,7 +1,7 @@
 from typing import Optional
 
 class HsvFilter:
-    def __init__( 
+    def __init__(self,
                  hMin: Optional[int] = None, 
                  sMin: Optional[int] = None, 
                  vMin: Optional[int] = None, 

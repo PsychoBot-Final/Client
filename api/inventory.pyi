@@ -1,3 +1,20 @@
+
+def get_inventory_region(screen_shot):
+    """
+    Extracts a specific region from the given screenshot representing the inventory area.
+
+    Parameters:
+    screen_shot (numpy.ndarray): A numpy array representing the screenshot image.
+
+    Returns:
+    numpy.ndarray: A numpy array containing the cropped region of the screenshot corresponding to the inventory area.
+
+    The inventory region is defined by:
+    - Starting at (x, y) coordinates (649, 227)
+    - Width of 189 pixels
+    - Height of 260 pixels
+    """
+
 def is_inventory_open(screen_shot) -> bool:
     """ Returns True if inventory tab is open. """
     ...
